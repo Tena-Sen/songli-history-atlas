@@ -134,6 +134,72 @@ body { margin: 0; background: #f6f2e8; color: #28302e; font-family: "Noto Sans S
 }
 .event-tag-seal { border-color: rgba(184, 106, 90, 0.52); color: #a66457; }
 
+.compare-tab {
+  border-bottom: 1px solid transparent;
+  color: #71817d;
+  font-size: .86rem;
+  padding: .46rem .12rem;
+  transition: color 180ms cubic-bezier(.23,1,.32,1), border-color 180ms cubic-bezier(.23,1,.32,1);
+}
+.compare-tab:hover, .compare-tab-active { border-color: #78a9a1; color: #397b74; }
+.night-mode .compare-tab { color: #a8b0aa; }
+.night-mode .compare-tab:hover, .night-mode .compare-tab-active { color: #9fc6bf; }
+
+.map-filter {
+  border: 1px solid rgba(40,48,46,.14);
+  color: #71817d;
+  font-size: .72rem;
+  padding: .32rem .55rem;
+  transition: color 180ms cubic-bezier(.23,1,.32,1), border-color 180ms cubic-bezier(.23,1,.32,1), background-color 180ms cubic-bezier(.23,1,.32,1);
+}
+.map-filter:hover, .map-filter-active { border-color: #78a9a1; background: rgba(120,169,161,.12); color: #397b74; }
+.night-mode .map-filter { border-color: rgba(232,226,211,.2); color: #b4b9b2; }
+.night-mode .map-filter:hover, .night-mode .map-filter-active { border-color: #78a9a1; background: rgba(120,169,161,.14); color: #9fc6bf; }
+
+.map-pin {
+  display: grid;
+  height: 30px;
+  width: 30px;
+  place-items: center;
+  border: 1px solid #78a9a1;
+  background: #f6f2e8;
+  color: #397b74;
+  cursor: pointer;
+  font-family: "Noto Serif SC", serif;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(27, 53, 50, .18);
+}
+.map-pin:hover { background: #78a9a1; color: #0e161a; }
+.map-pin-港口 { border-radius: 999px; }
+.map-pin-水路 { height: 24px; width: 24px; transform: rotate(45deg); }
+.map-pin-水路 span { transform: rotate(-45deg); }
+
+.historical-map { background: #dce5df; }
+.map-ink-ridge { fill: none; stroke: rgba(48, 69, 66, .12); stroke-width: 3; }
+.map-ink-ridge-soft { stroke: rgba(48, 69, 66, .07); stroke-width: 2; }
+.map-river { fill: none; stroke: rgba(120,169,161,.28); stroke-width: 12; stroke-linecap: round; }
+.map-river-secondary { stroke-width: 7; }
+.map-route { fill: none; stroke: #4f8c85; stroke-width: 2; stroke-dasharray: 7 8; opacity: .72; }
+.map-marginalia { fill: rgba(40,48,46,.3); font-family: "Noto Serif SC", serif; font-size: 18px; letter-spacing: 8px; }
+.archive-map-node { position: absolute; z-index: 2; display: grid; justify-items: center; gap: .38rem; transform: translate(-50%, -50%); color: #397b74; font-size: .72rem; transition: transform 180ms cubic-bezier(.23,1,.32,1), color 180ms cubic-bezier(.23,1,.32,1); }
+.archive-map-node > span { display: grid; height: 34px; width: 34px; place-items: center; border: 1px solid #78a9a1; background: #f6f2e8; box-shadow: 0 4px 15px rgba(36,48,46,.11); font-family: "Noto Serif SC", serif; font-weight: 700; }
+.archive-map-node > em { background: rgba(246,242,232,.75); padding: 1px 4px; font-family: "Noto Serif SC", serif; font-style: normal; }
+.archive-map-node:hover, .archive-map-node-active { color: #236a63; transform: translate(-50%, -50%) scale(1.08); }
+.archive-map-node-active > span { background: #78a9a1; color: #0e161a; box-shadow: 0 0 0 6px rgba(120,169,161,.15); }
+.archive-map-node-港口 > span { border-radius: 999px; }
+.archive-map-node-水路 > span { height: 27px; width: 27px; transform: rotate(45deg); }
+.archive-map-node-水路 > span::first-letter { transform: rotate(-45deg); }
+.night-mode .archive-map-node > span, .night-mode .archive-map-node > em { background: #0e161a; }
+.night-mode .archive-map-node-active > span { background: #78a9a1; }
+
+.detail-brand-mark { position: relative; display: inline-grid; height: 22px; width: 22px; place-items: center; border: 1px solid #78a9a1; color: #78a9a1; }
+.detail-brand-mark::before, .detail-brand-mark::after { content: ""; position: absolute; height: 1px; width: 72%; background: currentColor; }
+.detail-brand-mark::before { top: 19%; }.detail-brand-mark::after { bottom: 19%; }
+.detail-brand-mark i { height: 38%; width: 38%; border: 1px solid currentColor; border-radius: 999px; }.detail-brand-mark b { height: 1px; width: 67%; background: currentColor; }
+.detail-year-spine { display: flex; align-items: center; gap: .75rem; }.detail-year-spine > span { height: 1px; width: 44px; background: #78a9a1; position: relative; }.detail-year-spine > span::after { content: ""; position: absolute; right: 0; top: 50%; height: 10px; width: 10px; border: 1px solid #78a9a1; border-radius: 999px; background: #f6f2e8; transform: translate(50%,-50%); }.night-mode .detail-year-spine > span::after { background: #0e161a; }
+.detail-rupture-seal { display: inline-grid; min-height: 40px; min-width: 40px; place-items: center; margin-top: 1rem; border: 1px solid #b86a5a; color: #a66457; font-family: "Noto Serif SC", serif; font-size: .68rem; letter-spacing: .13em; padding: .25rem .45rem; }
+
 button:active { transform: scale(0.97); }
 
 .songli-mark::before,

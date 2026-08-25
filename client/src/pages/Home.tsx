@@ -3,6 +3,8 @@
  * 以宋代文人画的远近层次组织可探索的历史叙事。
  */
 import { useMemo, useState } from "react";
+import { ComparisonView } from "@/components/ComparisonView";
+import { GeographyMap } from "@/components/GeographyMap";
 import {
   ArrowDownRight,
   ArrowUpRight,
@@ -21,6 +23,7 @@ import {
 type Category = "全部" | "政权" | "外交" | "技术" | "制度" | "城市" | "转折";
 
 type TimelineEvent = {
+  id: string;
   year: string;
   title: string;
   short: string;
@@ -34,6 +37,7 @@ type TimelineEvent = {
 
 const EVENTS: TimelineEvent[] = [
   {
+    id: "northern-song",
     year: "960",
     title: "北宋建立",
     short: "赵匡胤建宋，新的中央政权开启。",
@@ -47,6 +51,7 @@ const EVENTS: TimelineEvent[] = [
     tone: "celadon",
   },
   {
+    id: "chanyuan",
     year: "1005",
     title: "澶渊之盟",
     short: "宋辽缔约，北方边境进入相对稳定期。",
@@ -60,6 +65,7 @@ const EVENTS: TimelineEvent[] = [
     tone: "ink",
   },
   {
+    id: "movable-type",
     year: "11世纪",
     title: "活字印刷",
     short: "毕昇以胶泥制字，印刷技术出现新突破。",
@@ -72,6 +78,7 @@ const EVENTS: TimelineEvent[] = [
     tone: "celadon",
   },
   {
+    id: "new-policies",
     year: "1069—1072",
     title: "王安石新法",
     short: "财政、官员选拔与军政制度同步调整。",
@@ -85,6 +92,7 @@ const EVENTS: TimelineEvent[] = [
     tone: "celadon",
   },
   {
+    id: "jingkang",
     year: "1127",
     title: "靖康之变",
     short: "北宋覆亡，宋室南迁；两宋由此分界。",
@@ -97,6 +105,7 @@ const EVENTS: TimelineEvent[] = [
     tone: "seal",
   },
   {
+    id: "linan",
     year: "1138",
     title: "临安为行在",
     short: "江南都城形成，水路城市展开。",
@@ -109,6 +118,7 @@ const EVENTS: TimelineEvent[] = [
     tone: "celadon",
   },
   {
+    id: "linan-fall",
     year: "1276",
     title: "临安失守",
     short: "元军攻破临安，南宋政权进一步收缩。",
@@ -121,6 +131,7 @@ const EVENTS: TimelineEvent[] = [
     tone: "seal",
   },
   {
+    id: "end-of-song",
     year: "1279",
     title: "宋朝终结",
     short: "崖山之后，两宋历史落幕。",
@@ -212,7 +223,9 @@ export default function Home() {
 
             <nav className="hidden items-center gap-7 text-sm text-[#53615d] lg:flex" aria-label="主导航">
               <a className="nav-link" href="#time-spine">历史脊柱</a>
+              <a className="nav-link" href="#comparison">对比视图</a>
               <a className="nav-link" href="#micro-tracks">微观轨道</a>
+              <a className="nav-link" href="#map-layer">地理图层</a>
               <a className="nav-link" href="#reading-room">阅读室</a>
               <a className="nav-link" href="#sources">参考来源</a>
             </nav>
@@ -418,6 +431,7 @@ export default function Home() {
                     </a>
                   </div>
                   <p className="mt-2 text-[11px] leading-5 text-[#8a948f]">{selected.source}</p>
+                  <a href={`/event/${selected.id}`} className="mt-5 inline-flex items-center gap-2 border-b border-[#78A9A1] pb-1 text-xs font-medium text-[#4f8c85] transition hover:gap-3">展开史料详情页 <ArrowUpRight size={13} /></a>
                   <div className="mt-7 flex items-center gap-3 border-t border-[#28302e]/10 pt-5">
                     <SealMark compact />
                     <p className="font-mono text-[9px] tracking-[0.16em] text-[#71817d]">SONGLI / ARCHIVE NOTE</p>
@@ -460,6 +474,10 @@ export default function Home() {
               </div>
             </div>
           </section>
+
+          <ComparisonView />
+
+          <GeographyMap />
 
           <section id="reading-room" className="mx-auto max-w-[1440px] border-x border-[#28302e]/10 px-6 py-20 md:px-12 lg:px-20 lg:py-28">
             <div className="grid gap-10 lg:grid-cols-[.95fr_1.05fr] lg:gap-16">

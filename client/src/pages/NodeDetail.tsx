@@ -1,0 +1,97 @@
+/**
+ * 设计提醒｜卷轴地志：独立详情页应像一册可回到长卷的史料注释，
+ * 以原文短摘、现代释义与出处三层并读，不把史料伪装为结论。
+ */
+import { ArrowLeft, ArrowUpRight, BookOpenText, Landmark, Quote, ScrollText } from "lucide-react";
+import { Link, useRoute } from "wouter";
+
+type Detail = {
+  id: string;
+  year: string;
+  title: string;
+  category: string;
+  summary: string;
+  interpretation: string;
+  excerpt: string;
+  excerptWork: string;
+  excerptNote: string;
+  sourceName: string;
+  sourceUrl: string;
+  context: string[];
+};
+
+const DETAILS: Detail[] = [
+  { id: "northern-song", year: "960", title: "北宋建立", category: "政权", summary: "赵匡胤建宋，新的中央政权开启。", interpretation: "建宋节点为时间轴提供了起点：此后北宋的制度扩展、城市发展和对北方关系的处理，才拥有共同的政治框架。", excerpt: "“建隆元年春正月乙巳，大赦，改元。”", excerptWork: "《宋史·太祖本纪》", excerptNote: "此处以建隆改元的短句提示王朝开端；断句依开放文本版本而异。", sourceName: "维基文库《宋史》开放文本", sourceUrl: "https://zh.wikisource.org/wiki/宋史/卷001", context: ["北宋阶段约为 960—1127 年。", "东京（今开封）是北宋城市生活与政治秩序的重要场景。", "详情页中的史料短摘用于阅读导引，不替代校勘本。"] },
+  { id: "chanyuan", year: "1005", title: "澶渊之盟", category: "外交", summary: "宋辽缔约，北方边境进入相对稳定期。", interpretation: "澶渊之盟体现北宋以盟约处理北方关系的策略。把它放入时间轴，是为了提示外交秩序如何影响财政、军政和社会稳定。", excerpt: "“自澶渊讲好，南北休兵。”", excerptWork: "《续资治通鉴长编》相关卷次", excerptNote: "引文作为盟约结果的导读短摘；具体条文与版本差异请参阅原典及专门研究。", sourceName: "Cambridge University Press：Chanyuan Covenant 研究", sourceUrl: "https://www.cambridge.org/core/journals/journal-of-chinese-history/article/fragility-of-peace-song-chinas-northwestern-frontier-and-erosion-of-the-chanyuan-paradigm-in-the-mideleventh-century/AF2F19A32A23ED0F304C3DE814851A3F", context: ["1005 年盟约是北宋外交史的重要节点。", "稳定并不意味着没有边境压力，而是政治与军事关系暂时形成可持续安排。", "本页建议与“外交”比较视图联读。"] },
+  { id: "movable-type", year: "11世纪", title: "活字印刷", category: "技术", summary: "毕昇以胶泥制字，印刷技术出现新突破。", interpretation: "活字印刷不是孤立的技术逸闻。它与雕版、书籍、教育和城市文化共同构成宋代知识传播的环境。", excerpt: "“庆历中，有布衣毕昇，又为活板。”", excerptWork: "《梦溪笔谈·技艺》", excerptNote: "这是现存文献中关于毕昇与活字印刷的著名记载；后文还描述“用胶泥刻字”的制作方法。", sourceName: "中国哲学书电子化计划《梦溪笔谈》", sourceUrl: "https://ctext.org/wiki.pl?if=gb&res=13396", context: ["活字印刷出现在 11 世纪。", "哥伦比亚大学资料指出，雕版印刷因成本较低仍长期占据主流。", "“技术”比较视图可查看其与南宋知识、城市生活的关联。"] },
+  { id: "new-policies", year: "1069—1072", title: "王安石新法", category: "制度", summary: "财政、官员选拔与军政制度同步调整。", interpretation: "新法的历史意义在于，它把财政、选官、军队与政府能力放进同一组改革议题，也由此引发持续的政治争论。", excerpt: "“熙宁二年二月，王安石为参知政事。”", excerptWork: "《宋史·神宗本纪》及《王安石传》相关记载", excerptNote: "以任用与改革启动的年代为索引；改革内容的现代释义参照研究数据库说明。", sourceName: "EBSCO Research Starters：王安石改革专题", sourceUrl: "https://www.ebsco.com/research-starters/history/wang-anshi-introduces-bureaucratic-reforms/", context: ["改革重点覆盖财政、官员训练与军政。", "改革带来政策创新，也带来围绕国家治理方式的争论。", "可在“制度”比较视图中对照南宋政局与行政重心。"] },
+  { id: "jingkang", year: "1127", title: "靖康之变", category: "转折", summary: "北宋覆亡，宋室南迁；两宋由此分界。", interpretation: "1127 年不只是政权失守的年份，也改变了宋朝的政治地理。此后，江南城市、交通与海贸的位置被重新放大。", excerpt: "“靖康二年，金人入京师。”", excerptWork: "《宋史·钦宗本纪》相关记载", excerptNote: "以简短本纪式表述提示北宋终结；具体经过可进一步对读本纪与相关编年史料。", sourceName: "史密森尼亚洲艺术国家博物馆：宋代分期", sourceUrl: "https://asia-archive.si.edu/learn/for-educators/teaching-china-with-the-smithsonian/explore-by-dynasty/song-dynasty/", context: ["北宋约在 1127 年结束，南宋自此开始。", "此节点建议与临安、明州、泉州的地图层联读。", "朱砂方印在站内统一标注此类王朝级转折。"] },
+  { id: "linan", year: "1138", title: "临安为行在", category: "城市", summary: "江南都城形成，水路城市展开。", interpretation: "临安的意义不只是都城南移。水路、运河、商市、港口和货币使用共同组成一座江南都城的日常基础。", excerpt: "“绍兴八年三月，诏以临安府为行在所。”", excerptWork: "《宋史·高宗本纪》相关记载", excerptNote: "以行在诏令为城市转向的史料题签；临安的城市生活可结合考古与文献材料继续阅读。", sourceName: "人民日报 / 中国大运河博物馆：南宋临安城专题", sourceUrl: "http://paper.people.com.cn/rmrb/pad/content/202512/27/content_30127489.html", context: ["1138 年临安正式成为行在所。", "临安至 1276 年都是南宋实际意义上的国都。", "地图层将临安与明州、泉州的贸易关联并置展示。"] },
+  { id: "linan-fall", year: "1276", title: "临安失守", category: "转折", summary: "元军攻破临安，南宋政权进一步收缩。", interpretation: "临安失守使南宋失去长期政治中心；但这一节点也提醒读者，政权终局之前，城市、交通和人群仍在延续与迁移。", excerpt: "“德祐二年二月，元师入临安。”", excerptWork: "《宋史·恭帝本纪》相关记载", excerptNote: "以本纪式短句作时点提示；可与临安城专题的考古和城市史说明共同阅读。", sourceName: "人民日报 / 中国大运河博物馆：南宋临安城专题", sourceUrl: "http://paper.people.com.cn/rmrb/pad/content/202512/27/content_30127489.html", context: ["1276 年临安被元军攻破。", "该节点并不等于南宋历史即时结束。", "与 1279 年终章共同构成晚期叙事。"] },
+  { id: "end-of-song", year: "1279", title: "宋朝终结", category: "政权", summary: "崖山之后，两宋历史落幕。", interpretation: "1279 年为两宋历史画下王朝意义上的终点；制度、城市、技术与审美遗产却并未随之消失，而是继续进入后世的文化史。", excerpt: "“崖山破，陆秀夫负帝昺赴海死。”", excerptWork: "《宋史·陆秀夫传》相关记载", excerptNote: "以传记叙事提示王朝末局；不同版本在用字与断句上可能存在差异。", sourceName: "史密森尼亚洲艺术国家博物馆：宋代 960—1279 年", sourceUrl: "https://asia-archive.si.edu/learn/for-educators/teaching-china-with-the-smithsonian/explore-by-dynasty/song-dynasty/", context: ["南宋阶段至 1279 年结束。", "本站将这一节点置为时间脊柱的终章。", "建议回到主轴，重新观察制度、技术和城市轨道如何穿越王朝兴亡。"] },
+];
+
+export default function NodeDetail() {
+  const [, params] = useRoute("/event/:id");
+  const detail = DETAILS.find((item) => item.id === params?.id);
+  const isRupture = detail?.category === "转折" || detail?.id === "end-of-song";
+
+  if (!detail) {
+    return (
+      <main className="min-h-screen bg-[#f6f2e8] px-6 py-24 text-[#28302e] night:bg-[#0e161a] night:text-[#e8e2d3]">
+        <div className="mx-auto max-w-2xl"><p className="eyebrow">未找到册页</p><h1 className="mt-4 font-serif text-5xl font-black">该节点尚未编入。</h1><Link href="/" className="mt-8 inline-flex items-center gap-2 text-sm text-[#4f8c85]"><ArrowLeft size={16} /> 回到历史脊柱</Link></div>
+      </main>
+    );
+  }
+
+  return (
+    <main className="min-h-screen bg-[#f6f2e8] text-[#28302e] night:bg-[#0e161a] night:text-[#e8e2d3]">
+      <header className="border-b border-[#28302e]/10 bg-[#f6f2e8]/92 backdrop-blur-xl night:bg-[#0e161a]/92">
+        <div className="mx-auto flex h-[76px] max-w-[1280px] items-center justify-between px-6 md:px-10">
+          <Link href="/" className="inline-flex items-center gap-3 text-sm text-[#53615d] transition hover:text-[#4f8c85] night:text-[#b4b9b2]"><span className="detail-brand-mark" aria-hidden="true"><i /><b /></span><ArrowLeft size={17} /> 回到历史脊柱</Link>
+          <span className="font-mono text-[10px] tracking-[0.18em] text-[#4f8c85]">SONGLI / SOURCE LEAF</span>
+        </div>
+      </header>
+
+      <article className="mx-auto max-w-[1280px] px-6 py-16 md:px-10 lg:py-24">
+        <div className="grid gap-12 lg:grid-cols-[.66fr_1.34fr]">
+          <aside className="lg:sticky lg:top-10 lg:h-fit">
+            <p className="eyebrow">史料详情页 · {detail.category}</p>
+            <div className="detail-year-spine mt-8"><span /><p className="font-mono text-sm tracking-[0.18em] text-[#4f8c85]">{detail.year}</p></div>
+            <h1 className="mt-2 font-serif text-5xl font-black tracking-[-0.06em] md:text-6xl">{detail.title}</h1>
+            {isRupture && <span className="detail-rupture-seal">王朝转折</span>}
+            <p className="mt-6 max-w-sm text-base leading-8 text-[#53615d] night:text-[#b4b9b2]">{detail.summary}</p>
+            <div className="mt-10 border-y border-[#28302e]/12 py-5 text-xs leading-6 text-[#71817d]">本页将古籍短摘、现代释义与资料来源并置；引文用于导读，具体异体字、断句与版本差异请以原典校勘本为准。</div>
+          </aside>
+
+          <div>
+            <section className="border-b border-[#28302e]/15 pb-10">
+              <div className="flex items-center gap-3"><Quote size={18} className="text-[#4f8c85]" strokeWidth={1.4} /><p className="eyebrow">古籍短摘</p></div>
+              <blockquote className="mt-7 border-l-2 border-[#78A9A1] pl-7 font-serif text-3xl font-bold leading-[1.65] tracking-[-0.035em] md:text-4xl">{detail.excerpt}</blockquote>
+              <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-[#71817d]"><span className="font-medium text-[#53615d] night:text-[#c2c8c1]">{detail.excerptWork}</span><span>{detail.excerptNote}</span></div>
+            </section>
+
+            <section className="border-b border-[#28302e]/15 py-10">
+              <div className="flex items-center gap-3"><ScrollText size={18} className="text-[#4f8c85]" strokeWidth={1.4} /><p className="eyebrow">现代释义</p></div>
+              <p className="mt-6 max-w-3xl text-[17px] leading-9 text-[#53615d] night:text-[#b4b9b2]">{detail.interpretation}</p>
+            </section>
+
+            <section className="border-b border-[#28302e]/15 py-10">
+              <div className="flex items-center gap-3"><Landmark size={18} className="text-[#4f8c85]" strokeWidth={1.4} /><p className="eyebrow">同页上下文</p></div>
+              <ol className="mt-6 divide-y divide-[#28302e]/12 border-y border-[#28302e]/12">
+                {detail.context.map((line, index) => <li key={line} className="grid grid-cols-[36px_1fr] gap-4 py-5 text-sm leading-7 text-[#53615d] night:text-[#b4b9b2]"><span className="font-mono text-[10px] text-[#78A9A1]">0{index + 1}</span><span>{line}</span></li>)}
+              </ol>
+            </section>
+
+            <section className="pt-10">
+              <div className="flex items-center gap-3"><BookOpenText size={18} className="text-[#4f8c85]" strokeWidth={1.4} /><p className="eyebrow">延伸阅读</p></div>
+              <a href={detail.sourceUrl} target="_blank" rel="noreferrer" className="mt-6 flex items-start justify-between gap-6 border-y border-[#28302e]/15 py-6 transition hover:border-[#78A9A1]">
+                <div><p className="font-serif text-2xl font-bold tracking-[-0.03em]">{detail.sourceName}</p><p className="mt-2 text-sm leading-6 text-[#71817d]">点击打开公开来源，继续查阅原典入口或研究说明。</p></div><ArrowUpRight className="mt-1 shrink-0 text-[#4f8c85]" size={18} />
+              </a>
+            </section>
+          </div>
+        </div>
+      </article>
+    </main>
+  );
+}
