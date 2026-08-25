@@ -3,6 +3,7 @@
  * 以原文短摘、现代释义与出处三层并读，不把史料伪装为结论。
  */
 import { ArrowLeft, ArrowUpRight, BookOpenText, Landmark, Quote, ScrollText } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useRoute } from "wouter";
 import { trpc } from "@/lib/trpc";
 
@@ -32,11 +33,44 @@ const DETAILS: Detail[] = [
   { id: "end-of-song", year: "1279", title: "宋朝终结", category: "政权", summary: "崖山之后，两宋历史落幕。", interpretation: "1279 年为两宋历史画下王朝意义上的终点；制度、城市、技术与审美遗产却并未随之消失，而是继续进入后世的文化史。", excerpt: "“崖山破，陆秀夫负帝昺赴海死。”", excerptWork: "《宋史·陆秀夫传》相关记载", excerptNote: "以传记叙事提示王朝末局；不同版本在用字与断句上可能存在差异。", sourceName: "史密森尼亚洲艺术国家博物馆：宋代 960—1279 年", sourceUrl: "https://asia-archive.si.edu/learn/for-educators/teaching-china-with-the-smithsonian/explore-by-dynasty/song-dynasty/", context: ["南宋阶段至 1279 年结束。", "本站将这一节点置为时间脊柱的终章。", "建议回到主轴，重新观察制度、技术和城市轨道如何穿越王朝兴亡。"] },
 ];
 
+type HistoricalPerson = {
+  id: string;
+  name: string;
+  role: string;
+  note: string;
+  nodeIds: string[];
+  sourceName: string;
+  sourceUrl: string;
+};
+
+const PEOPLE: Record<string, HistoricalPerson> = {
+  "zhao-kuangyin": { id: "zhao-kuangyin", name: "赵匡胤", role: "北宋开国君主", note: "作为960年建宋节点的核心人物，提示新的中央政权由此开启。", nodeIds: ["northern-song"], sourceName: "《宋史·太祖本纪》开放文本", sourceUrl: "https://zh.wikisource.org/wiki/宋史/卷001" },
+  "song-zhenzong": { id: "song-zhenzong", name: "宋真宗", role: "北宋皇帝", note: "与澶渊之盟所代表的北方关系处理直接相关。", nodeIds: ["chanyuan"], sourceName: "澶渊盟约研究入口", sourceUrl: "https://www.cambridge.org/core/journals/journal-of-chinese-history/article/fragility-of-peace-song-chinas-northwestern-frontier-and-erosion-of-the-chanyuan-paradigm-in-the-mideleventh-century/AF2F19A32A23ED0F304C3DE814851A3F" },
+  "kou-zhun": { id: "kou-zhun", name: "寇准", role: "北宋宰相", note: "站内以其作为澶渊之盟叙事的相关人物标签，不展开完整生平判断。", nodeIds: ["chanyuan"], sourceName: "澶渊盟约研究入口", sourceUrl: "https://www.cambridge.org/core/journals/journal-of-chinese-history/article/fragility-of-peace-song-chinas-northwestern-frontier-and-erosion-of-the-chanyuan-paradigm-in-the-mideleventh-century/AF2F19A32A23ED0F304C3DE814851A3F" },
+  "bi-sheng": { id: "bi-sheng", name: "毕昇", role: "活字制作相关人物", note: "《梦溪笔谈》以“庆历中，有布衣毕昇，又为活板”记录其与活字印刷的关联。", nodeIds: ["movable-type"], sourceName: "中国哲学书电子化计划《梦溪笔谈》", sourceUrl: "https://ctext.org/wiki.pl?if=gb&res=13396" },
+  "shen-kuo": { id: "shen-kuo", name: "沈括", role: "《梦溪笔谈》作者", note: "站内通过其笔记文字，为毕昇与活字印刷节点保留可追溯的史料入口。", nodeIds: ["movable-type"], sourceName: "中国哲学书电子化计划《梦溪笔谈》", sourceUrl: "https://ctext.org/wiki.pl?if=gb&res=13396" },
+  "wang-anshi": { id: "wang-anshi", name: "王安石", role: "北宋改革者", note: "与熙宁新法的财政、选官与军政调整相关。", nodeIds: ["new-policies"], sourceName: "EBSCO 王安石改革专题", sourceUrl: "https://www.ebsco.com/research-starters/history/wang-anshi-introduces-bureaucratic-reforms/" },
+  "song-shenzong": { id: "song-shenzong", name: "宋神宗", role: "北宋皇帝", note: "新法推行所处政治环境的重要人物标签。", nodeIds: ["new-policies"], sourceName: "EBSCO 王安石改革专题", sourceUrl: "https://www.ebsco.com/research-starters/history/wang-anshi-introduces-bureaucratic-reforms/" },
+  "song-gaozong": { id: "song-gaozong", name: "宋高宗", role: "南宋开创者", note: "从1127年南渡到1138年临安为行在，串联两宋分界与江南都城形成。", nodeIds: ["jingkang", "linan"], sourceName: "《宋史·高宗纪》与宋代分期资料", sourceUrl: "https://zh.wikisource.org/wiki/宋史/卷030" },
+  "lu-xiufu": { id: "lu-xiufu", name: "陆秀夫", role: "南宋末年大臣", note: "《宋史》记其在南宋末局追从二王，并与张世杰等共同参与海上政局。", nodeIds: ["linan-fall", "end-of-song"], sourceName: "《宋史·卷451》", sourceUrl: "https://zh.wikisource.org/wiki/宋史/卷451" },
+  "wen-tianxiang": { id: "wen-tianxiang", name: "文天祥", role: "南宋末年政治人物", note: "站内将其作为临安失守后与南宋末局相关的阅读标签。", nodeIds: ["linan-fall", "end-of-song"], sourceName: "维基文库《文天祥传》", sourceUrl: "https://zh.wikisource.org/wiki/文天祥傳" },
+  "zhang-shijie": { id: "zhang-shijie", name: "张世杰", role: "南宋末年将领", note: "与陆秀夫共同关联南宋政权收缩与崖山终局的站内叙事。", nodeIds: ["linan-fall", "end-of-song"], sourceName: "《宋史·卷451》", sourceUrl: "https://zh.wikisource.org/wiki/宋史/卷451" },
+};
+
+const PEOPLE_BY_NODE: Record<string, string[]> = {
+  "northern-song": ["zhao-kuangyin"], chanyuan: ["song-zhenzong", "kou-zhun"], "movable-type": ["bi-sheng", "shen-kuo"], "new-policies": ["wang-anshi", "song-shenzong"], jingkang: ["song-gaozong"], linan: ["song-gaozong"], "linan-fall": ["lu-xiufu", "wen-tianxiang", "zhang-shijie"], "end-of-song": ["lu-xiufu", "wen-tianxiang", "zhang-shijie"],
+};
+
 export default function NodeDetail() {
   const [, params] = useRoute("/event/:id");
   const detail = DETAILS.find((item) => item.id === params?.id);
   const isRupture = detail?.category === "转折" || detail?.id === "end-of-song";
   const analysis = trpc.textStudy.analyze.useMutation();
+  const people = useMemo(() => detail ? (PEOPLE_BY_NODE[detail.id] ?? []).map((id) => PEOPLE[id]).filter(Boolean) : [], [detail]);
+  const [activePersonId, setActivePersonId] = useState<string | null>(null);
+  useEffect(() => { setActivePersonId(people[0]?.id ?? null); }, [detail?.id, people]);
+  const activePerson = activePersonId ? PEOPLE[activePersonId] : null;
+  const relatedNodes = activePerson ? activePerson.nodeIds.map((id) => DETAILS.find((item) => item.id === id)).filter(Boolean) : [];
 
   if (!detail) {
     return (
@@ -57,12 +91,13 @@ export default function NodeDetail() {
 
       <article className="mx-auto max-w-[1280px] px-6 py-16 md:px-10 lg:py-24">
         <div className="grid gap-12 lg:grid-cols-[.66fr_1.34fr]">
-          <aside className="lg:sticky lg:top-10 lg:h-fit">
+          <aside className="detail-archive-aside lg:sticky lg:top-10 lg:h-fit">
             <p className="eyebrow">史料详情页 · {detail.category}</p>
             <div className="detail-year-spine mt-8"><span /><p className="font-mono text-sm tracking-[0.18em] text-[#4f8c85]">{detail.year}</p></div>
             <h1 className="mt-2 font-serif text-5xl font-black tracking-[-0.06em] md:text-6xl">{detail.title}</h1>
             {isRupture && <span className="detail-rupture-seal">王朝转折</span>}
             <p className="mt-6 max-w-sm text-base leading-8 text-[#53615d] night:text-[#b4b9b2]">{detail.summary}</p>
+            {people.length > 0 && <div className="mt-8 border-y border-[#28302e]/12 py-5"><p className="eyebrow">相关人物</p><div className="mt-4 flex flex-wrap gap-2">{people.map((person) => <button key={person.id} type="button" onClick={() => setActivePersonId(person.id)} className={`person-tag ${activePersonId === person.id ? "person-tag-active" : ""}`}>{person.name}<span>{person.role}</span></button>)}</div></div>}
             <div className="mt-10 border-y border-[#28302e]/12 py-5 text-xs leading-6 text-[#71817d]">本页将古籍短摘、现代释义与资料来源并置；引文用于导读，具体异体字、断句与版本差异请以原典校勘本为准。</div>
           </aside>
 
@@ -79,9 +114,9 @@ export default function NodeDetail() {
             </section>
 
             <section className="border-b border-[#28302e]/15 py-10">
-              <div className="flex items-center justify-between gap-5"><div className="flex items-center gap-3"><BookOpenText size={18} className="text-[#4f8c85]" strokeWidth={1.4} /><p className="eyebrow">AI 辅助研读</p></div><span className="font-mono text-[10px] tracking-[0.14em] text-[#71817d]">逐句白话 / 深度解析</span></div>
-              <p className="mt-5 max-w-3xl text-sm leading-7 text-[#71817d]">基于当前页引用的短摘生成逐句白话翻译和阅读提示。输出仅作阅读辅助，不替代版本校勘、训诂或专业研究结论。</p>
-              <button type="button" onClick={() => analysis.mutate({ excerpt: detail.excerpt, title: detail.title, source: detail.excerptWork })} disabled={analysis.isPending} className="mt-6 inline-flex items-center gap-2 bg-[#28302e] px-4 py-3 text-sm text-[#f6f2e8] transition hover:bg-[#4f8c85] disabled:cursor-not-allowed disabled:opacity-60 night:bg-[#78a9a1] night:text-[#0e161a]">{analysis.isPending ? "正在逐句研读…" : "生成白话翻译与解析"}<ArrowUpRight size={15} /></button>
+              <div className="flex items-center justify-between gap-5"><div className="flex items-center gap-3"><BookOpenText size={18} className="text-[#4f8c85]" strokeWidth={1.4} /><p className="eyebrow">释读旁注</p></div><span className="font-mono text-[10px] tracking-[0.14em] text-[#71817d]">白话解读 / 阅读提示</span></div>
+              <p className="mt-5 max-w-3xl text-sm leading-7 text-[#71817d]">依据当前页引用的短摘生成逐句白话解读与阅读提示。该旁注只服务于初读，不替代版本校勘、训诂或专业研究结论。</p>
+              <button type="button" onClick={() => analysis.mutate({ excerpt: detail.excerpt, title: detail.title, source: detail.excerptWork })} disabled={analysis.isPending} className="mt-6 inline-flex items-center gap-2 border-b border-[#78a9a1] pb-2 text-sm font-medium text-[#397b74] transition hover:gap-3 disabled:cursor-not-allowed disabled:opacity-60">{analysis.isPending ? "正在生成旁注…" : "展开白话释读"}<ArrowUpRight size={15} /></button>
               {analysis.isError && <p className="mt-4 text-sm text-[#a66457]">解析暂时未完成：{analysis.error.message}</p>}
               {analysis.data && <div className="ai-study-sheet mt-7"><div className="border-b border-[#28302e]/12 pb-5"><p className="eyebrow">逐句翻译</p>{analysis.data.sentences.map((sentence, index) => <div key={`${sentence.original}-${index}`} className="mt-5 grid gap-2 border-l border-[#78a9a1] pl-4"><p className="font-serif text-xl font-bold">{sentence.original}</p><p className="text-sm leading-7 text-[#53615d] night:text-[#b4b9b2]">{sentence.modern}</p><p className="text-xs leading-6 text-[#71817d]">{sentence.note}</p></div>)}</div><div className="grid gap-6 py-6 md:grid-cols-2"><div><p className="eyebrow">深度解析</p><p className="mt-3 text-sm leading-7 text-[#53615d] night:text-[#b4b9b2]">{analysis.data.deepAnalysis}</p></div><div><p className="eyebrow">阅读提示</p><p className="mt-3 text-sm leading-7 text-[#53615d] night:text-[#b4b9b2]">{analysis.data.readingHint}</p></div></div><p className="border-t border-[#28302e]/12 pt-4 text-xs leading-6 text-[#71817d]">{analysis.data.caveat}</p></div>}
             </section>
@@ -92,6 +127,14 @@ export default function NodeDetail() {
                 {detail.context.map((line, index) => <li key={line} className="grid grid-cols-[36px_1fr] gap-4 py-5 text-sm leading-7 text-[#53615d] night:text-[#b4b9b2]"><span className="font-mono text-[10px] text-[#78A9A1]">0{index + 1}</span><span>{line}</span></li>)}
               </ol>
             </section>
+
+            {activePerson && <section className="border-b border-[#28302e]/15 py-10">
+              <div className="flex items-center justify-between gap-5"><div className="flex items-center gap-3"><Landmark size={18} className="text-[#4f8c85]" strokeWidth={1.4} /><p className="eyebrow">人物关联索引</p></div><span className="font-mono text-[10px] tracking-[0.14em] text-[#71817d]">{activePerson.name}</span></div>
+              <p className="mt-5 text-sm leading-7 text-[#53615d] night:text-[#b4b9b2]">{activePerson.note}</p>
+              <div className="mt-6 divide-y divide-[#28302e]/12 border-y border-[#28302e]/12">{relatedNodes.map((node) => node && <Link key={node.id} href={`/event/${node.id}`} className="group flex items-center justify-between gap-5 py-4"><div><p className="font-mono text-[10px] tracking-[0.15em] text-[#4f8c85]">{node.year}</p><p className="mt-1 font-serif text-xl font-bold">{node.title}</p></div><ArrowUpRight size={16} className="text-[#78a9a1] transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" /></Link>)}</div>
+              <a href={activePerson.sourceUrl} target="_blank" rel="noreferrer" className="mt-5 inline-flex items-center gap-2 text-xs text-[#4f8c85] hover:underline">查看人物关联来源：{activePerson.sourceName}<ArrowUpRight size={13} /></a>
+              <p className="mt-4 text-xs leading-6 text-[#71817d]">人物关联仅对应本站已编入的叙事节点，不表示完整生平或穷尽全部历史关联。</p>
+            </section>}
 
             <section className="pt-10">
               <div className="flex items-center gap-3"><BookOpenText size={18} className="text-[#4f8c85]" strokeWidth={1.4} /><p className="eyebrow">延伸阅读</p></div>

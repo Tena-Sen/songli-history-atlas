@@ -81,46 +81,40 @@ export function ExploreLab({ events }: { events: ExploreEvent[] }) {
     canvas.height = 1350;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    ctx.fillStyle = "#f6f2e8";
+    ctx.fillStyle = "#f5f0e3";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = "rgba(40,48,46,.17)";
-    ctx.lineWidth = 2;
-    ctx.strokeRect(48, 48, canvas.width - 96, canvas.height - 96);
-    ctx.strokeStyle = "#78a9a1";
-    ctx.beginPath(); ctx.moveTo(96, 160); ctx.lineTo(310, 160); ctx.stroke();
-    ctx.fillStyle = "#4f8c85";
-    ctx.font = "500 28px 'IBM Plex Mono', monospace";
-    ctx.fillText("SONGLI / MY READING PATH", 96, 130);
-    ctx.fillStyle = "#28302e";
-    ctx.font = "700 86px 'Noto Serif SC', serif";
-    ctx.fillText("我的阅读路径", 96, 270);
-    ctx.font = "400 32px 'Noto Sans SC', sans-serif";
-    ctx.fillStyle = "#53615d";
-    ctx.fillText("北宋至南宋 · 微观时间轴", 96, 335);
-    ctx.strokeStyle = "#78a9a1";
-    ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.moveTo(160, 440); ctx.lineTo(160, 1110); ctx.stroke();
+    for (let i = 0; i < 150; i += 1) {
+      const x = (i * 83) % canvas.width; const y = (i * 149) % canvas.height;
+      ctx.fillStyle = `rgba(67, 83, 76, ${0.018 + (i % 4) * 0.006})`;
+      ctx.fillRect(x, y, 1.2, 1.2);
+    }
+    const wash = ctx.createRadialGradient(845, 255, 30, 825, 280, 470);
+    wash.addColorStop(0, "rgba(118, 161, 153, .30)"); wash.addColorStop(1, "rgba(118, 161, 153, 0)");
+    ctx.fillStyle = wash; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    const inkMountain = (baseY: number, opacity: number, shift: number) => {
+      ctx.beginPath(); ctx.moveTo(0, baseY); ctx.lineTo(0, baseY - 70);
+      for (let x = 0; x <= canvas.width; x += 120) { const peak = baseY - 80 - ((x / 120 + shift) % 3) * 55; ctx.quadraticCurveTo(x + 48, peak, x + 120, baseY - 55 + ((x / 120 + shift) % 2) * 30); }
+      ctx.lineTo(canvas.width, baseY); ctx.closePath(); ctx.fillStyle = `rgba(47, 70, 68, ${opacity})`; ctx.fill();
+    };
+    inkMountain(1170, 0.11, 0); inkMountain(1230, 0.07, 1);
+    ctx.strokeStyle = "rgba(40,48,46,.18)"; ctx.lineWidth = 2; ctx.strokeRect(48, 48, canvas.width - 96, canvas.height - 96);
+    ctx.strokeStyle = "#78a9a1"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(96, 154); ctx.lineTo(334, 154); ctx.stroke();
+    ctx.fillStyle = "#4f8c85"; ctx.font = "500 25px 'IBM Plex Mono', monospace"; ctx.fillText("SONGLI / READING PATH", 96, 122);
+    ctx.save(); ctx.scale(0.82, 1.16); ctx.fillStyle = "#26322f"; ctx.font = "500 88px 'Noto Serif SC', serif"; ctx.fillText("我的阅读路径", 118, 250); ctx.restore();
+    ctx.font = "400 28px 'Noto Sans SC', sans-serif"; ctx.fillStyle = "#53615d"; ctx.fillText("北宋至南宋 · 微观时间轴", 96, 332);
+    ctx.strokeStyle = "#78a9a1"; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(170, 435); ctx.lineTo(170, 1095); ctx.stroke();
     savedEvents.slice(0, 7).forEach((event, index) => {
-      const y = 470 + index * 88;
-      ctx.fillStyle = event.tone === "seal" ? "#b86a5a" : "#78a9a1";
-      ctx.beginPath(); ctx.arc(160, y - 8, 10, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = "#4f8c85";
-      ctx.font = "500 22px 'IBM Plex Mono', monospace";
-      ctx.fillText(event.year, 205, y - 15);
-      ctx.fillStyle = "#28302e";
-      ctx.font = "700 38px 'Noto Serif SC', serif";
-      ctx.fillText(event.title, 205, y + 30);
+      const y = 486 + index * 88;
+      ctx.fillStyle = event.tone === "seal" ? "#b86a5a" : "#78a9a1"; ctx.beginPath(); ctx.arc(170, y - 8, 10, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "#4f8c85"; ctx.font = "500 20px 'IBM Plex Mono', monospace"; ctx.fillText(event.year, 222, y - 15);
+      ctx.save(); ctx.scale(0.9, 1.06); ctx.fillStyle = "#28302e"; ctx.font = "500 39px 'Noto Serif SC', serif"; ctx.fillText(event.title, 246, y + 28); ctx.restore();
     });
     if (savedEvents.length === 0) {
-      ctx.fillStyle = "#71817d";
-      ctx.font = "400 36px 'Noto Sans SC', sans-serif";
-      ctx.fillText("尚未收藏节点。回到时间轴，从一页开始。", 205, 510);
+      ctx.fillStyle = "#71817d"; ctx.font = "400 32px 'Noto Sans SC', sans-serif"; ctx.fillText("尚未收藏节点。回到时间轴，从一页开始。", 220, 510);
     }
-    ctx.fillStyle = "#71817d";
-    ctx.font = "400 22px 'Noto Sans SC', sans-serif";
-    ctx.fillText("宋历 · 以一条天青线重读两宋", 96, 1212);
-    ctx.fillStyle = "#78a9a1";
-    ctx.fillRect(96, 1242, 210, 2);
+    ctx.save(); ctx.translate(910, 985); ctx.rotate(-0.1); ctx.strokeStyle = "#b86a5a"; ctx.lineWidth = 3; ctx.strokeRect(-38, -38, 76, 76); ctx.font = "500 22px 'Noto Serif SC', serif"; ctx.fillStyle = "#a66457"; ctx.fillText("阅记", -22, 8); ctx.restore();
+    ctx.fillStyle = "#53615d"; ctx.font = "400 22px 'Noto Sans SC', sans-serif"; ctx.fillText("宋历 · 以一条天青线重读两宋", 96, 1212);
+    ctx.fillStyle = "#78a9a1"; ctx.fillRect(96, 1242, 210, 2);
     const anchor = document.createElement("a");
     anchor.download = "songli-my-reading-path.png";
     anchor.href = canvas.toDataURL("image/png");
