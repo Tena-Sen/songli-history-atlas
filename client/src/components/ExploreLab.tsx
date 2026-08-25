@@ -1,0 +1,180 @@
+/**
+ * 设计提醒｜卷轴地志：个人阅读路径与关系图谱应保持册页索引感，
+ * 用留白、细线与天青节点组织探索，而非通用仪表板卡片。
+ */
+import { useEffect, useMemo, useState } from "react";
+import { Bookmark, Check, ChevronDown, ChevronUp, Download, Network, Share2, X } from "lucide-react";
+
+export type ExploreEvent = {
+  id: string;
+  year: string;
+  title: string;
+  category: string;
+  tag: string;
+  tone: "celadon" | "seal" | "ink";
+};
+
+const STORAGE_KEY = "songli-reading-path-v1";
+
+const RELATION_EDGES = [
+  ["northern-song", "chanyuan", "边境秩序"],
+  ["chanyuan", "new-policies", "国家能力"],
+  ["movable-type", "new-policies", "知识与制度"],
+  ["new-policies", "jingkang", "北宋晚局"],
+  ["jingkang", "linan", "政治南移"],
+  ["linan", "linan-fall", "都城命运"],
+  ["linan", "end-of-song", "南宋终局"],
+  ["movable-type", "linan", "知识传播"],
+] as const;
+
+function yearNumber(year: string) {
+  if (year.includes("11世纪")) return 1040;
+  const first = year.match(/\d{3,4}/)?.[0];
+  return first ? Number(first) : 960;
+}
+
+export function ExploreLab({ events }: { events: ExploreEvent[] }) {
+  const [saved, setSaved] = useState<string[]>([]);
+  const [activeNode, setActiveNode] = useState<string>("linan");
+  const [shared, setShared] = useState(false);
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(STORAGE_KEY);
+      if (stored) setSaved(JSON.parse(stored));
+    } catch {
+      setSaved([]);
+    }
+  }, []);
+
+  const save = (next: string[]) => {
+    setSaved(next);
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  };
+
+  const toggle = (id: string) => {
+    save(saved.includes(id) ? saved.filter((item) => item !== id) : [...saved, id]);
+  };
+
+  const move = (id: string, direction: -1 | 1) => {
+    const index = saved.indexOf(id);
+    const target = index + direction;
+    if (index < 0 || target < 0 || target >= saved.length) return;
+    const next = [...saved];
+    [next[index], next[target]] = [next[target], next[index]];
+    save(next);
+  };
+
+  const savedEvents = useMemo(
+    () => events.filter((event) => saved.includes(event.id)).sort((a, b) => yearNumber(a.year) - yearNumber(b.year)),
+    [events, saved]
+  );
+
+  const active = events.find((event) => event.id === activeNode) ?? events[0];
+  const linkedIds = new Set<string>(
+    RELATION_EDGES.filter(([from, to]) => from === activeNode || to === activeNode).flatMap(([from, to]) => [from, to])
+  );
+
+  const makePoster = () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 1080;
+    canvas.height = 1350;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.fillStyle = "#f6f2e8";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = "rgba(40,48,46,.17)";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(48, 48, canvas.width - 96, canvas.height - 96);
+    ctx.strokeStyle = "#78a9a1";
+    ctx.beginPath(); ctx.moveTo(96, 160); ctx.lineTo(310, 160); ctx.stroke();
+    ctx.fillStyle = "#4f8c85";
+    ctx.font = "500 28px 'IBM Plex Mono', monospace";
+    ctx.fillText("SONGLI / MY READING PATH", 96, 130);
+    ctx.fillStyle = "#28302e";
+    ctx.font = "700 86px 'Noto Serif SC', serif";
+    ctx.fillText("我的阅读路径", 96, 270);
+    ctx.font = "400 32px 'Noto Sans SC', sans-serif";
+    ctx.fillStyle = "#53615d";
+    ctx.fillText("北宋至南宋 · 微观时间轴", 96, 335);
+    ctx.strokeStyle = "#78a9a1";
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(160, 440); ctx.lineTo(160, 1110); ctx.stroke();
+    savedEvents.slice(0, 7).forEach((event, index) => {
+      const y = 470 + index * 88;
+      ctx.fillStyle = event.tone === "seal" ? "#b86a5a" : "#78a9a1";
+      ctx.beginPath(); ctx.arc(160, y - 8, 10, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "#4f8c85";
+      ctx.font = "500 22px 'IBM Plex Mono', monospace";
+      ctx.fillText(event.year, 205, y - 15);
+      ctx.fillStyle = "#28302e";
+      ctx.font = "700 38px 'Noto Serif SC', serif";
+      ctx.fillText(event.title, 205, y + 30);
+    });
+    if (savedEvents.length === 0) {
+      ctx.fillStyle = "#71817d";
+      ctx.font = "400 36px 'Noto Sans SC', sans-serif";
+      ctx.fillText("尚未收藏节点。回到时间轴，从一页开始。", 205, 510);
+    }
+    ctx.fillStyle = "#71817d";
+    ctx.font = "400 22px 'Noto Sans SC', sans-serif";
+    ctx.fillText("宋历 · 以一条天青线重读两宋", 96, 1212);
+    ctx.fillStyle = "#78a9a1";
+    ctx.fillRect(96, 1242, 210, 2);
+    const anchor = document.createElement("a");
+    anchor.download = "songli-my-reading-path.png";
+    anchor.href = canvas.toDataURL("image/png");
+    anchor.click();
+    setShared(true);
+    window.setTimeout(() => setShared(false), 2200);
+  };
+
+  return (
+    <section id="reading-path" className="border-y border-[#28302e]/10 bg-[#edf0e8] night:bg-[#101b1e]">
+      <div className="mx-auto max-w-[1440px] px-6 py-20 md:px-12 lg:px-20 lg:py-28">
+        <div className="grid gap-8 lg:grid-cols-[.75fr_1.25fr] lg:items-end">
+          <div><p className="eyebrow">探索工作台</p><h2 className="mt-3 max-w-md font-serif text-4xl font-black tracking-[-0.055em] md:text-5xl">把历史读成自己的路径。</h2></div>
+          <p className="max-w-[650px] justify-self-end text-base leading-8 text-[#53615d] night:text-[#b4b9b2]">收藏并排序感兴趣的节点，生成一张可分享的阅读海报；在关系图谱中切换焦点，观察制度、技术、外交与城市如何相互牵引。</p>
+        </div>
+
+        <div className="mt-12 grid border-y border-[#28302e]/15 lg:grid-cols-[.9fr_1.1fr]">
+          <div className="border-b border-[#28302e]/15 px-0 py-8 lg:border-b-0 lg:border-r lg:px-9 lg:py-10">
+            <div className="flex items-center justify-between"><div className="flex items-center gap-3"><Bookmark size={19} className="text-[#4f8c85]" strokeWidth={1.4} /><p className="eyebrow">我的阅读路径</p></div><span className="font-mono text-[10px] tracking-[0.14em] text-[#71817d]">{savedEvents.length.toString().padStart(2, "0")} SAVED</span></div>
+            <div className="mt-7 divide-y divide-[#28302e]/12 border-y border-[#28302e]/12">
+              {savedEvents.length ? savedEvents.map((event, index) => <div key={event.id} className="flex items-center justify-between gap-4 py-4"><div><p className="font-mono text-[10px] tracking-[0.16em] text-[#4f8c85]">{event.year}</p><p className="mt-1 font-serif text-xl font-bold">{event.title}</p></div><div className="flex items-center gap-1"><button type="button" disabled={index === 0} onClick={() => move(event.id, -1)} className="path-order-button" aria-label={`上移${event.title}`}><ChevronUp size={14} /></button><button type="button" disabled={index === savedEvents.length - 1} onClick={() => move(event.id, 1)} className="path-order-button" aria-label={`下移${event.title}`}><ChevronDown size={14} /></button><button type="button" onClick={() => toggle(event.id)} className="grid h-8 w-8 place-items-center text-[#71817d] transition hover:text-[#a66457]" aria-label={`移除${event.title}`}><X size={16} /></button></div></div>) : <p className="py-7 text-sm leading-7 text-[#71817d]">尚未收藏节点。在右侧索引中点选书签，即可形成个人的阅读线索。</p>}
+            </div>
+            <button type="button" onClick={makePoster} className="mt-7 inline-flex items-center gap-2 bg-[#28302e] px-4 py-3 text-sm text-[#f6f2e8] transition hover:bg-[#4f8c85] night:bg-[#78a9a1] night:text-[#0e161a]"><Share2 size={16} /> 生成分享海报 <Download size={14} /></button>
+            {shared && <p className="mt-3 inline-flex items-center gap-2 text-xs text-[#4f8c85]"><Check size={14} /> 海报已下载，可直接分享。</p>}
+          </div>
+
+          <div className="px-0 py-8 lg:px-9 lg:py-10">
+            <div className="flex items-center gap-3"><Network size={19} className="text-[#4f8c85]" strokeWidth={1.4} /><p className="eyebrow">节点关系图谱</p></div>
+            <div className="relation-board mt-7" role="group" aria-label="历史节点关联图谱">
+              <svg viewBox="0 0 720 370" className="absolute inset-0 h-full w-full" aria-hidden="true">
+                {RELATION_EDGES.map(([from, to, label]) => {
+                  const a = events.findIndex((event) => event.id === from);
+                  const b = events.findIndex((event) => event.id === to);
+                  const positions = [[10,22],[30,12],[50,24],[26,55],[61,51],[85,37],[76,78],[42,84]];
+                  const [x1, y1] = positions[a] ?? [0, 0]; const [x2, y2] = positions[b] ?? [0, 0];
+                  const strong = from === activeNode || to === activeNode;
+                  return <g key={`${from}-${to}`}><line x1={`${x1}%`} y1={`${y1}%`} x2={`${x2}%`} y2={`${y2}%`} className={strong ? "relation-line relation-line-active" : "relation-line"} /><text x={`${(x1+x2)/2}%`} y={`${(y1+y2)/2}%`} className={strong ? "relation-label relation-label-active" : "relation-label"}>{label}</text></g>;
+                })}
+              </svg>
+              {events.map((event, index) => {
+                const positions = [[10,22],[30,12],[50,24],[26,55],[61,51],[85,37],[76,78],[42,84]];
+                const [x, y] = positions[index] ?? [50, 50];
+                const focused = event.id === activeNode; const related = linkedIds.has(event.id);
+                return <button key={event.id} type="button" onClick={() => setActiveNode(event.id)} style={{ left: `${x}%`, top: `${y}%` }} className={`relation-node ${focused ? "relation-node-active" : related ? "relation-node-related" : ""}`} aria-pressed={focused}><span>{event.year.replace("世纪", "C")}</span><em>{event.title}</em></button>;
+              })}
+            </div>
+            <div className="mt-6 border-t border-[#28302e]/12 pt-5"><p className="font-mono text-[10px] tracking-[0.16em] text-[#4f8c85]">当前焦点 · {active?.year}</p><p className="mt-2 font-serif text-2xl font-bold">{active?.title}</p><p className="mt-2 text-sm leading-7 text-[#71817d]">高亮连线显示与此节点直接相关的历史议题。图谱用于梳理叙事关系，不以线条表达因果强度或历史重要性。</p></div>
+          </div>
+        </div>
+
+        <div className="mt-10 grid gap-x-8 gap-y-5 border-y border-[#28302e]/15 py-7 md:grid-cols-2 lg:grid-cols-4">
+          {events.map((event) => <button type="button" key={event.id} onClick={() => toggle(event.id)} className={`reading-index ${saved.includes(event.id) ? "reading-index-active" : ""}`}><span>{saved.includes(event.id) ? <Check size={13} /> : <Bookmark size={13} />}</span><span className="font-mono text-[10px] text-[#4f8c85]">{event.year}</span><strong>{event.title}</strong></button>)}
+        </div>
+      </div>
+    </section>
+  );
+}

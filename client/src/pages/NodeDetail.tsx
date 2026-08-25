@@ -4,6 +4,7 @@
  */
 import { ArrowLeft, ArrowUpRight, BookOpenText, Landmark, Quote, ScrollText } from "lucide-react";
 import { Link, useRoute } from "wouter";
+import { trpc } from "@/lib/trpc";
 
 type Detail = {
   id: string;
@@ -35,6 +36,7 @@ export default function NodeDetail() {
   const [, params] = useRoute("/event/:id");
   const detail = DETAILS.find((item) => item.id === params?.id);
   const isRupture = detail?.category === "转折" || detail?.id === "end-of-song";
+  const analysis = trpc.textStudy.analyze.useMutation();
 
   if (!detail) {
     return (
@@ -74,6 +76,14 @@ export default function NodeDetail() {
             <section className="border-b border-[#28302e]/15 py-10">
               <div className="flex items-center gap-3"><ScrollText size={18} className="text-[#4f8c85]" strokeWidth={1.4} /><p className="eyebrow">现代释义</p></div>
               <p className="mt-6 max-w-3xl text-[17px] leading-9 text-[#53615d] night:text-[#b4b9b2]">{detail.interpretation}</p>
+            </section>
+
+            <section className="border-b border-[#28302e]/15 py-10">
+              <div className="flex items-center justify-between gap-5"><div className="flex items-center gap-3"><BookOpenText size={18} className="text-[#4f8c85]" strokeWidth={1.4} /><p className="eyebrow">AI 辅助研读</p></div><span className="font-mono text-[10px] tracking-[0.14em] text-[#71817d]">逐句白话 / 深度解析</span></div>
+              <p className="mt-5 max-w-3xl text-sm leading-7 text-[#71817d]">基于当前页引用的短摘生成逐句白话翻译和阅读提示。输出仅作阅读辅助，不替代版本校勘、训诂或专业研究结论。</p>
+              <button type="button" onClick={() => analysis.mutate({ excerpt: detail.excerpt, title: detail.title, source: detail.excerptWork })} disabled={analysis.isPending} className="mt-6 inline-flex items-center gap-2 bg-[#28302e] px-4 py-3 text-sm text-[#f6f2e8] transition hover:bg-[#4f8c85] disabled:cursor-not-allowed disabled:opacity-60 night:bg-[#78a9a1] night:text-[#0e161a]">{analysis.isPending ? "正在逐句研读…" : "生成白话翻译与解析"}<ArrowUpRight size={15} /></button>
+              {analysis.isError && <p className="mt-4 text-sm text-[#a66457]">解析暂时未完成：{analysis.error.message}</p>}
+              {analysis.data && <div className="ai-study-sheet mt-7"><div className="border-b border-[#28302e]/12 pb-5"><p className="eyebrow">逐句翻译</p>{analysis.data.sentences.map((sentence, index) => <div key={`${sentence.original}-${index}`} className="mt-5 grid gap-2 border-l border-[#78a9a1] pl-4"><p className="font-serif text-xl font-bold">{sentence.original}</p><p className="text-sm leading-7 text-[#53615d] night:text-[#b4b9b2]">{sentence.modern}</p><p className="text-xs leading-6 text-[#71817d]">{sentence.note}</p></div>)}</div><div className="grid gap-6 py-6 md:grid-cols-2"><div><p className="eyebrow">深度解析</p><p className="mt-3 text-sm leading-7 text-[#53615d] night:text-[#b4b9b2]">{analysis.data.deepAnalysis}</p></div><div><p className="eyebrow">阅读提示</p><p className="mt-3 text-sm leading-7 text-[#53615d] night:text-[#b4b9b2]">{analysis.data.readingHint}</p></div></div><p className="border-t border-[#28302e]/12 pt-4 text-xs leading-6 text-[#71817d]">{analysis.data.caveat}</p></div>}
             </section>
 
             <section className="border-b border-[#28302e]/15 py-10">

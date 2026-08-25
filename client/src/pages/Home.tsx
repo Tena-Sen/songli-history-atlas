@@ -4,6 +4,7 @@
  */
 import { useMemo, useState } from "react";
 import { ComparisonView } from "@/components/ComparisonView";
+import { ExploreLab } from "@/components/ExploreLab";
 import { GeographyMap } from "@/components/GeographyMap";
 import {
   ArrowDownRight,
@@ -194,6 +195,7 @@ export default function Home() {
   const [selected, setSelected] = useState<TimelineEvent>(EVENTS[0]);
   const [night, setNight] = useState(false);
   const [query, setQuery] = useState("");
+  const [yearRange, setYearRange] = useState({ start: 960, end: 1279 });
 
   const visibleEvents = useMemo(() => {
     const normalized = query.trim();
@@ -202,9 +204,10 @@ export default function Home() {
       const matchQuery =
         !normalized ||
         `${event.year}${event.title}${event.short}${event.tag}`.toLowerCase().includes(normalized.toLowerCase());
-      return matchFilter && matchQuery;
+      const firstYear = event.year.includes("11世纪") ? 1040 : Number(event.year.match(/\d{3,4}/)?.[0] ?? 960);
+      return matchFilter && matchQuery && firstYear >= yearRange.start && firstYear <= yearRange.end;
     });
-  }, [filter, query]);
+  }, [filter, query, yearRange]);
 
   const scrollToTimeline = () => document.getElementById("time-spine")?.scrollIntoView({ behavior: "smooth" });
 
@@ -224,6 +227,7 @@ export default function Home() {
             <nav className="hidden items-center gap-7 text-sm text-[#53615d] lg:flex" aria-label="主导航">
               <a className="nav-link" href="#time-spine">历史脊柱</a>
               <a className="nav-link" href="#comparison">对比视图</a>
+              <a className="nav-link" href="#reading-path">阅读路径</a>
               <a className="nav-link" href="#micro-tracks">微观轨道</a>
               <a className="nav-link" href="#map-layer">地理图层</a>
               <a className="nav-link" href="#reading-room">阅读室</a>
@@ -352,6 +356,12 @@ export default function Home() {
                     className="h-11 w-full border-b border-[#28302e]/20 bg-transparent pl-9 pr-3 text-sm outline-none transition placeholder:text-[#9ca6a1] focus:border-[#78A9A1] night:border-white/20"
                   />
                 </label>
+                <div className="mt-8 border-y border-[#28302e]/12 py-5">
+                  <div className="flex items-center justify-between"><p className="font-mono text-[10px] tracking-[0.18em] text-[#4f8c85]">年份跨度</p><button type="button" onClick={() => setYearRange({ start: 960, end: 1279 })} className="text-[10px] text-[#71817d] underline underline-offset-4">重置</button></div>
+                  <p className="mt-3 font-serif text-xl font-bold">{yearRange.start} — {yearRange.end}</p>
+                  <label className="mt-4 block text-[11px] text-[#71817d]">起点<input className="year-slider" type="range" min="960" max="1279" value={yearRange.start} onChange={(event) => setYearRange((range) => ({ start: Math.min(Number(event.target.value), range.end), end: range.end }))} /></label>
+                  <label className="mt-3 block text-[11px] text-[#71817d]">终点<input className="year-slider" type="range" min="960" max="1279" value={yearRange.end} onChange={(event) => setYearRange((range) => ({ start: range.start, end: Math.max(Number(event.target.value), range.start) }))} /></label>
+                </div>
               </aside>
 
               <div className="relative pt-3 before:absolute before:bottom-0 before:left-[17px] before:top-0 before:w-px before:bg-[#28302e]/14 md:before:left-1/2">
@@ -440,6 +450,8 @@ export default function Home() {
               </aside>
             </div>
           </section>
+
+          <ExploreLab events={EVENTS} />
 
           <section id="micro-tracks" className="border-y border-[#28302e]/10 bg-[#ebe7db] night:bg-[#121d20]">
             <div className="mx-auto max-w-[1440px] px-6 py-20 md:px-12 lg:px-20 lg:py-28">
