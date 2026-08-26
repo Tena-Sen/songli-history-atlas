@@ -7,6 +7,7 @@ import { ComparisonView } from "@/components/ComparisonView";
 import { ExploreLab } from "@/components/ExploreLab";
 import { FateSlices } from "@/components/FateSlices";
 import { GeographyMap } from "@/components/GeographyMap";
+import { HistoryChain } from "@/components/HistoryChain";
 import { nextTimelineIndex } from "@/lib/timelineNavigation";
 import {
   ArrowDownRight,
@@ -240,6 +241,18 @@ export default function Home() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [visibleEvents, selected.id]);
 
+  useEffect(() => {
+    const handleChainSelection = (event: Event) => {
+      const id = (event as CustomEvent<string>).detail;
+      const target = EVENTS.find((item) => item.id === id);
+      if (!target) return;
+      setSelected(target);
+      setTimelineAnnouncement(`已从连锁反应切换至 ${target.year} · ${target.title}`);
+    };
+    window.addEventListener("songli:select-event", handleChainSelection);
+    return () => window.removeEventListener("songli:select-event", handleChainSelection);
+  }, []);
+
   return (
     <div className={night ? "night-mode min-h-screen" : "min-h-screen"}>
       <div className="paper-shell min-h-screen overflow-x-hidden bg-[#f6f2e8] text-[#28302e] transition-colors duration-300">
@@ -258,6 +271,7 @@ export default function Home() {
               <a className="nav-link" href="#comparison">对比视图</a>
               <a className="nav-link" href="#reading-path">阅读路径</a>
               <a className="nav-link" href="#fate-slices">命运切片</a>
+              <a className="nav-link" href="#history-chain">连锁反应</a>
               <a className="nav-link" href="#micro-tracks">微观轨道</a>
               <a className="nav-link" href="#map-layer">地理图层</a>
               <a className="nav-link" href="#reading-room">阅读室</a>
@@ -487,6 +501,8 @@ export default function Home() {
           </section>
 
           <FateSlices />
+
+          <HistoryChain />
 
           <ExploreLab events={EVENTS} />
 

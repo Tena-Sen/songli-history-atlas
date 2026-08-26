@@ -117,3 +117,11 @@
 16. 中央广播电视总台，《百家讲坛》“超级大国”北宋王朝为何会突然灭亡：https://tv.cctv.com/v/a/ARTIDHsF5VXEqQvaBT0T0r9X210504.html
 17. The Metropolitan Museum of Art，Southern Song Dynasty（访问受安全验证限制）：https://www.metmuseum.org/essays/southern-song-dynasty-1127-1279
 18. 抖音公开视频标题，“为什么说‘联金灭辽’是北宋灭亡的加速器？”（节目相关标签，未取得可核验转录）：https://www.douyin.com/video/7668683114500258634
+
+### 历史连锁反应：结构核验
+
+- 哥伦比亚大学 Asia for Educators 的中国历史时间线将北宋标为 960—1127，首都为汴京（今开封）；将南宋标为 1127—1279，首都为今杭州，并概述两宋时期的商业、海贸、城市扩展与技术创新。该资料支持网站将“政权转折”与“城市、交通和经济社会变化”并置，而非将事件解释为单线因果。
+- 大都会艺术博物馆南宋专题在本次访问中触发安全验证，未获得正文；不将其作为本轮新增连锁反应文案的唯一依据。
+- 连锁反应模块应使用“前因 / 当下冲突 / 后续余波”的阅读结构；所有连线表示可继续阅读的历史关联，不表达单一原因、必然结果或历史重要性的量化排序。
+
+19. Columbia University, Asia for Educators, Timeline of Chinese Historical Periods and Dynasties：https://afe.easia.columbia.edu/timelines/china_timeline.htm

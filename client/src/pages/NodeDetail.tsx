@@ -75,6 +75,12 @@ export default function NodeDetail() {
   const [activePersonId, setActivePersonId] = useState<string | null>(null);
   const [bioOpen, setBioOpen] = useState(false);
   useEffect(() => { setActivePersonId(people[0]?.id ?? null); }, [detail?.id, people]);
+  useEffect(() => {
+    const requestedPerson = new URLSearchParams(window.location.search).get("person");
+    if (!requestedPerson || !people.some((person) => person.id === requestedPerson)) return;
+    setActivePersonId(requestedPerson);
+    setBioOpen(true);
+  }, [detail?.id, people]);
   const activePerson = activePersonId ? PEOPLE[activePersonId] : null;
   const relatedNodes = activePerson ? activePerson.nodeIds.map((id) => DETAILS.find((item) => item.id === id)).filter(Boolean) : [];
 
