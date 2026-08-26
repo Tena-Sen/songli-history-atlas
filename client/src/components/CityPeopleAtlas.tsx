@@ -12,7 +12,7 @@ const EVENT_NAMES: Record<string, { year: string; title: string }> = {
 
 function openTimelineEvent(id: string) {
   window.dispatchEvent(new CustomEvent("songli:select-event", { detail: id }));
-  window.setTimeout(() => document.getElementById("time-spine")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
+  window.setTimeout(() => (document.getElementById("parallel-scroll") ?? document.getElementById("time-spine"))?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
 }
 
 export function CityPeopleAtlas() {

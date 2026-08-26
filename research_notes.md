@@ -135,3 +135,12 @@
 
 20. Columbia University, Asia for Educators, Song Dynasty China: Outside Trade：https://afe.easia.columbia.edu/songdynasty-module/outside-trade.html
 21. Columbia University, Asia for Educators, Song Dynasty China: Cities of the Song：https://afe.easia.columbia.edu/songdynasty-module/cities-hangzhou.html
+
+## 同类型网站参考调研（2026-08）
+
+- **The Museum of the World**（Google Arts & Culture Lab × British Museum）：官方项目页说明，该体验把大英博物馆藏品映射到时间轴，让访问者从时间、洲别与文化三个维度发现连接，并提供策展人讲解。可借鉴其“时间脊柱 + 主题轨道 + 单项史料”的多尺度探索，但其官方页明确标为仅桌面 WebGL 实验；宋历应保持现有的响应式、文本优先与低功耗体验。来源：https://experiments.withgoogle.com/the-museum-of-the-world
+- **Mapping the Republic of Letters**（Stanford）：项目以书信、旅行和学术网络为对象，并说明其互动工具用于观察网络随时间如何演变；合作项目 ePistolarium 可执行地理、时间、社会网络和共引查询。可借鉴其“人物—地点—时间”不被压缩为单一因果的研究式关系图原则；宋历应继续将连线标为阅读关联，并保留史料链接。来源：http://republicofletters.stanford.edu/
+- **ORBIS: The Stanford Geospatial Network Model of the Roman World**（Stanford）：当前互动界面将路线、网络、流量模式并置，并允许以月份/季节、最快/最省/最短、道路/河流/沿海与开阔海域等条件切换。可借鉴其将地图交互明确为“带条件的阅读模型”，但宋历不应在缺少可复核宋代行旅成本数据时仿造计算器；更适合先实现水路、沿海、都城三类可见性过滤。来源：https://orbis.stanford.edu/
+- **Histography**：页面自称将维基百科历史事件转为“每个点均为历史事件”的长跨度交互时间轴，并按地质/历史时代分段导航；当前页面仍提示不支持移动设备。可借鉴其缩放后渐进显露事件密度的原则，但宋历不可照搬“数据点即史实”的弱来源表现，须保持精选节点、来源和移动端可读性。来源：https://histography.io/
+- **OldMapsOnline TimeMap**：其历史区域页面使用以地图为中心的浏览入口，但当前页面在自动化环境中未完整加载资料内容。可作为“地图优先、历史图像为核心”的视觉取向参考；不建议将其加载不稳定的重型地图体验作为宋历的默认路径。来源：https://www.oldmapsonline.org/en/history/regions
+- **OpenHistoricalMap**：官网自述为由公众创建、面向公共领域的全球互动历史地图；界面提供日期范围、单日期滑块、按日/月/年/十年/百年步进和播放控制。可借鉴“时间范围 + 粒度步进”控件语言，宋历则应限定在已有的两宋年份范围并仍以核验史料为准。来源：https://www.openhistoricalmap.org/

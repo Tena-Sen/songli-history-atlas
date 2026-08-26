@@ -9,6 +9,7 @@ import { ExploreLab } from "@/components/ExploreLab";
 import { FateSlices } from "@/components/FateSlices";
 import { GeographyMap } from "@/components/GeographyMap";
 import { HistoryChain } from "@/components/HistoryChain";
+import { ParallelScrollTimeline } from "@/components/ParallelScrollTimeline";
 import { nextTimelineIndex } from "@/lib/timelineNavigation";
 import {
   ArrowDownRight,
@@ -222,6 +223,7 @@ export default function Home() {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented) return;
       const target = event.target as HTMLElement | null;
       if (target?.matches("input, textarea, select, [contenteditable='true']")) return;
       if (!(["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"] as string[]).includes(event.key) || visibleEvents.length === 0) return;
@@ -269,6 +271,7 @@ export default function Home() {
 
             <nav className="hidden items-center gap-7 text-sm text-[#53615d] lg:flex" aria-label="主导航">
               <a className="nav-link" href="#time-spine">历史脊柱</a>
+              <a className="nav-link" href="#parallel-scroll">并读卷轴</a>
               <a className="nav-link" href="#comparison">对比视图</a>
               <a className="nav-link" href="#reading-path">阅读路径</a>
               <a className="nav-link" href="#fate-slices">命运切片</a>
@@ -501,6 +504,8 @@ export default function Home() {
               </aside>
             </div>
           </section>
+
+          <ParallelScrollTimeline events={EVENTS} />
 
           <FateSlices />
 
