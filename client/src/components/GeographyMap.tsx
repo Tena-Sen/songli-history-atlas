@@ -4,7 +4,7 @@
  */
 import { useEffect, useMemo, useState } from "react";
 import { Anchor, Landmark, MapPinned, Navigation, ShipWheel } from "lucide-react";
-import { GEO_LAYERS, GEO_OVERLAY_POINTS, reconcileGeoSelection, type GeoLayerId, type GeoOverlayPoint, visibleGeoPoints } from "@/lib/spatialExplorer";
+import { GEO_LAYERS, GEO_OVERLAY_POINTS, reconcileGeoSelection, type GeoLayerId, type GeoOverlayPoint, visibleGeoPointsAtYear } from "@/lib/spatialExplorer";
 
 const EVENT_LABELS: Record<string, string> = {
   "northern-song": "建宋", chanyuan: "澶渊", "champa-rice": "占城稻", "qingli-war": "庆历战争", "qingli-reforms": "庆历改革", "wujing-zongyao": "《武经总要》", "movable-type": "活字", "new-policies": "熙宁新法", "iron-production": "铁业", "huizong-art": "徽宗画院", "jin-rise": "金朝建立", jingkang: "靖康", "zhu-xi": "朱熹", linan: "临安行在", "southern-sea-routes": "南方海路", "zhu-fan-zhi": "《诸蕃志》", "jin-end": "金朝终结", "linan-societies": "西湖社团", "linan-fall": "临安失守", "song-shipwreck": "宋末沉船", "end-of-song": "崖山之后",
@@ -22,7 +22,11 @@ function kindIcon(kind: GeoOverlayPoint["kind"]) {
 export function GeographyMap() {
   const [activeLayers, setActiveLayers] = useState<GeoLayerId[]>(["administrative", "waterways", "ports"]);
   const [selected, setSelected] = useState<GeoOverlayPoint>(GEO_OVERLAY_POINTS.find((point) => point.id === "linan-prefecture") ?? GEO_OVERLAY_POINTS[0]);
-  const visible = useMemo(() => visibleGeoPoints(activeLayers), [activeLayers]);
+  const [focusYear, setFocusYear] = useState<number>();
+  const [autoPeriod, setAutoPeriod] = useState(true);
+  const visible = useMemo(() => visibleGeoPointsAtYear(activeLayers, autoPeriod ? focusYear : undefined), [activeLayers, autoPeriod, focusYear]);
+  const showWaterways = activeLayers.includes("waterways") && visible.some((point) => point.layerIds.includes("waterways"));
+  const showPorts = activeLayers.includes("ports") && visible.some((point) => point.layerIds.includes("ports"));
   const KindIcon = kindIcon(selected.kind);
 
   useEffect(() => {
@@ -39,6 +43,12 @@ export function GeographyMap() {
     };
     window.addEventListener("songli:select-place", receivePlace);
     return () => window.removeEventListener("songli:select-place", receivePlace);
+  }, []);
+
+  useEffect(() => {
+    const receiveTime = (event: Event) => setFocusYear((event as CustomEvent<{ year?: number }>).detail?.year);
+    window.addEventListener("songli:time-focus", receiveTime);
+    return () => window.removeEventListener("songli:time-focus", receiveTime);
   }, []);
 
   const toggleLayer = (layerId: GeoLayerId) => {
@@ -58,6 +68,7 @@ export function GeographyMap() {
 
         <div className="mt-10 flex flex-wrap gap-2 border-y border-[#28302e]/12 py-4" role="group" aria-label="选择地理叠层">
           {GEO_LAYERS.map((layer) => <button key={layer.id} type="button" onClick={() => toggleLayer(layer.id)} aria-pressed={activeLayers.includes(layer.id)} className={`map-filter ${activeLayers.includes(layer.id) ? "map-filter-active" : ""}`}><span>{layer.label}</span><small>{layer.note}</small></button>)}
+          <button type="button" onClick={() => setAutoPeriod((value) => !value)} aria-pressed={autoPeriod} className={`map-filter ${autoPeriod ? "map-filter-active" : ""}`}><span>随时间轴显隐</span><small>{autoPeriod && focusYear ? `${focusYear} 年` : "显示全部时段"}</small></button>
         </div>
 
         <div className="mt-8 grid border-y border-[#28302e]/15 lg:grid-cols-[1fr_320px]">
@@ -65,12 +76,12 @@ export function GeographyMap() {
             <svg viewBox="0 0 900 540" aria-hidden="true" className="absolute inset-0 h-full w-full">
               <path d="M64 73 C187 10, 314 76, 392 146 C457 203, 439 269, 538 314 C650 365, 794 381, 892 500" className="map-ink-ridge" />
               <path d="M38 93 C181 97, 289 126, 430 202 C569 278, 730 284, 888 351" className="map-ink-ridge map-ink-ridge-soft" />
-              {activeLayers.includes("waterways") && <><path d="M308 20 C340 98, 390 143, 465 193 C512 225, 560 255, 604 325 C640 382, 697 423, 890 505" className="map-river" /><path d="M497 259 C573 287, 657 305, 761 330 C807 344, 851 373, 896 421" className="map-river map-river-secondary" /><path d="M747 344 C711 403, 682 443, 642 521" className="map-river map-river-secondary" /></>}
-              {activeLayers.includes("ports") && <><path d="M622 304 C676 310, 727 321, 750 328" className="map-route" /><path d="M752 332 C731 395, 690 452, 646 500" className="map-route" /></>}
+              {showWaterways && <><path d="M308 20 C340 98, 390 143, 465 193 C512 225, 560 255, 604 325 C640 382, 697 423, 890 505" className="map-river" /><path d="M497 259 C573 287, 657 305, 761 330 C807 344, 851 373, 896 421" className="map-river map-river-secondary" /><path d="M747 344 C711 403, 682 443, 642 521" className="map-river map-river-secondary" /></>}
+              {showPorts && <><path d="M622 304 C676 310, 727 321, 750 328" className="map-route" /><path d="M752 332 C731 395, 690 452, 646 500" className="map-route" /></>}
               <text x="86" y="97" className="map-marginalia">北方</text><text x="727" y="478" className="map-marginalia">东南海域</text><text x="462" y="376" className="map-marginalia">江南水网</text>
             </svg>
 
-            <div className="absolute left-5 top-5 bg-[#f6f2e8]/90 px-3 py-2 text-[11px] leading-5 text-[#53615d] backdrop-blur-sm night:bg-[#0e161a]/85 night:text-[#b4b9b2]"><p className="font-mono tracking-[.14em] text-[#4f8c85]">空间图例</p><p className="mt-1">府州县锚点 · 水路关联 · 港口海贸</p></div>
+            <div className="absolute left-5 top-5 bg-[#f6f2e8]/90 px-3 py-2 text-[11px] leading-5 text-[#53615d] backdrop-blur-sm night:bg-[#0e161a]/85 night:text-[#b4b9b2]"><p className="font-mono tracking-[.14em] text-[#4f8c85]">空间图例</p><p className="mt-1">府州县锚点 · 水路关联 · 港口海贸</p>{autoPeriod && <p className="mt-1 text-[#397b74]">随主轴年份显示：{focusYear ?? "等待定位"}</p>}</div>
             {visible.map((place) => <button key={place.id} type="button" onClick={() => setSelected(place)} className={`archive-map-node archive-map-node-${place.kind} ${selected.id === place.id ? "archive-map-node-active" : ""}`} style={{ left: `${place.x}%`, top: `${place.y}%` }} aria-label={`查看${place.ancientName}${place.name}说明`}><span>{place.kind === "州县" ? "州" : place.kind === "港口" ? "港" : "水"}</span><em>{place.ancientName}</em></button>)}
             <div className="absolute bottom-5 left-5 flex items-center gap-2 bg-[#f6f2e8]/90 px-3 py-2 text-[11px] text-[#53615d] backdrop-blur-sm night:bg-[#0e161a]/85 night:text-[#b4b9b2]"><Anchor size={14} className="text-[#4f8c85]" />天青线＝阅读关联，非路线或边界复原</div>
           </div>

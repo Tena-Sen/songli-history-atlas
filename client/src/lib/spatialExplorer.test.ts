@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { eventIdsForZoom, eventMatchesFacets, geoPointsForCity, reconcileGeoSelection, visibleGeoPoints } from "./spatialExplorer";
+import { eventIdsForZoom, eventMatchesFacets, geoPointsForCity, reconcileGeoSelection, visibleGeoPoints, visibleGeoPointsAtYear } from "./spatialExplorer";
 
 describe("spatial explorer data", () => {
   it("layers administrative, waterway and port anchors without claiming a single map mode", () => {
@@ -20,5 +20,10 @@ describe("spatial explorer data", () => {
     const administrative = visibleGeoPoints(["administrative"]);
     expect(reconcileGeoSelection("quanzhou-port", administrative)?.id).toBe("kaifeng-prefecture");
     expect(reconcileGeoSelection("linan-prefecture", administrative)?.id).toBe("linan-prefecture");
+  });
+
+  it("filters administrative and port anchors by the active historical period", () => {
+    expect(visibleGeoPointsAtYear(["administrative", "ports"], 1044).some((point) => point.id === "linan-prefecture")).toBe(false);
+    expect(visibleGeoPointsAtYear(["administrative", "ports"], 1225).some((point) => point.id === "qiantang-renhe")).toBe(true);
   });
 });

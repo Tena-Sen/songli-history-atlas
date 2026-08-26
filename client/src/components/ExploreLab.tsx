@@ -5,6 +5,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Bookmark, BookmarkPlus, Check, ChevronDown, ChevronUp, Download, Network, Share2, Shuffle, Trash2, X } from "lucide-react";
 import { addPosterPreset, DEFAULT_POSTER_PRESETS, makePosterPreset, parsePosterPresets, pickRandomPosterPreset, posterFieldsFromPreset, POSTER_PRESET_STORAGE_KEY, removePosterPreset, type PosterPreset, type PosterThemeName } from "@/lib/posterPresets";
+import { relationshipPositions } from "@/lib/relationshipGraph";
 
 export type ExploreEvent = {
   id: string;
@@ -26,14 +27,15 @@ const POSTER_THEMES = {
 type PosterTheme = PosterThemeName;
 
 const RELATION_EDGES = [
-  ["northern-song", "chanyuan", "边境秩序"],
-  ["chanyuan", "new-policies", "国家能力"],
-  ["movable-type", "new-policies", "知识与制度"],
-  ["new-policies", "jingkang", "北宋晚局"],
-  ["jingkang", "linan", "政治南移"],
-  ["linan", "linan-fall", "都城命运"],
-  ["linan", "end-of-song", "南宋终局"],
-  ["movable-type", "linan", "知识传播"],
+  ["northern-song", "chanyuan", "边境秩序"], ["northern-song", "champa-rice", "农政阅读"],
+  ["champa-rice", "qingli-war", "供给与边防"], ["qingli-war", "qingli-reforms", "边防与政务"],
+  ["qingli-reforms", "wujing-zongyao", "军政与知识"], ["movable-type", "new-policies", "知识与制度"],
+  ["new-policies", "iron-production", "制度与生产"], ["new-policies", "huizong-art", "北宋晚期"],
+  ["huizong-art", "jin-rise", "北方格局"], ["jin-rise", "jingkang", "危局阅读"],
+  ["jingkang", "linan", "政治南移"], ["linan", "linan-societies", "都城生活"],
+  ["linan", "southern-sea-routes", "水路与海贸"], ["southern-sea-routes", "zhu-fan-zhi", "港口记录"],
+  ["zhu-fan-zhi", "song-shipwreck", "海洋史料"], ["linan-societies", "linan-fall", "都城命运"],
+  ["linan-fall", "end-of-song", "宋末行动"],
 ] as const;
 
 function yearNumber(year: string) {
@@ -128,6 +130,8 @@ export function ExploreLab({ events }: { events: ExploreEvent[] }) {
   );
 
   const active = events.find((event) => event.id === activeNode) ?? events[0];
+  const relationPositions = useMemo(() => relationshipPositions(events), [events]);
+  const positionById = useMemo(() => new Map(relationPositions.map((position) => [position.id, position])), [relationPositions]);
   const linkedIds = new Set<string>(
     RELATION_EDGES.filter(([from, to]) => from === activeNode || to === activeNode).flatMap(([from, to]) => [from, to])
   );
@@ -215,22 +219,25 @@ export function ExploreLab({ events }: { events: ExploreEvent[] }) {
 
           <div className="px-0 py-8 lg:px-9 lg:py-10">
             <div className="flex items-center gap-3"><Network size={19} className="text-[#4f8c85]" strokeWidth={1.4} /><p className="eyebrow">节点关系图谱</p></div>
+            <p className="mt-3 text-xs leading-6 text-[#71817d]">横向读年代，纵向读主题。全部节点各占一处；仅当前焦点的关联线显示文字注记，避免把史料索引糊成一团。</p>
             <div className="relation-board mt-7" role="group" aria-label="历史节点关联图谱">
-              <svg viewBox="0 0 720 370" className="absolute inset-0 h-full w-full" aria-hidden="true">
+              <div className="relation-axis relation-axis-x" aria-hidden="true"><span>960</span><span>北宋中期</span><span>1127</span><span>南宋</span><span>1279</span></div>
+              <div className="relation-axis relation-axis-y" aria-hidden="true"><span>政治</span><span>军事</span><span>制度</span><span>经济</span><span>城市</span><span>知识</span><span>思想</span></div>
+              <svg viewBox="0 0 720 420" className="absolute inset-0 h-full w-full" aria-hidden="true">
                 {RELATION_EDGES.map(([from, to, label]) => {
-                  const a = events.findIndex((event) => event.id === from);
-                  const b = events.findIndex((event) => event.id === to);
-                  const positions = [[10,22],[30,12],[50,24],[26,55],[61,51],[85,37],[76,78],[42,84]];
-                  const [x1, y1] = positions[a] ?? [0, 0]; const [x2, y2] = positions[b] ?? [0, 0];
+                  const a = positionById.get(from);
+                  const b = positionById.get(to);
+                  if (!a || !b) return null;
+                  const [x1, y1] = [a.x, a.y]; const [x2, y2] = [b.x, b.y];
                   const strong = from === activeNode || to === activeNode;
-                  return <g key={`${from}-${to}`}><line x1={`${x1}%`} y1={`${y1}%`} x2={`${x2}%`} y2={`${y2}%`} className={strong ? "relation-line relation-line-active" : "relation-line"} /><text x={`${(x1+x2)/2}%`} y={`${(y1+y2)/2}%`} className={strong ? "relation-label relation-label-active" : "relation-label"}>{label}</text></g>;
+                  return <g key={`${from}-${to}`}><line x1={`${x1}%`} y1={`${y1}%`} x2={`${x2}%`} y2={`${y2}%`} className={strong ? "relation-line relation-line-active" : "relation-line"} />{strong && <text x={`${(x1+x2)/2}%`} y={`${(y1+y2)/2}%`} className="relation-label relation-label-active">{label}</text>}</g>;
                 })}
               </svg>
-              {events.map((event, index) => {
-                const positions = [[10,22],[30,12],[50,24],[26,55],[61,51],[85,37],[76,78],[42,84]];
-                const [x, y] = positions[index] ?? [50, 50];
+              {events.map((event) => {
+                const position = positionById.get(event.id);
+                if (!position) return null;
                 const focused = event.id === activeNode; const related = linkedIds.has(event.id);
-                return <button key={event.id} type="button" onClick={() => setActiveNode(event.id)} style={{ left: `${x}%`, top: `${y}%` }} className={`relation-node ${focused ? "relation-node-active" : related ? "relation-node-related" : ""}`} aria-pressed={focused}><span>{event.year.replace("世纪", "C")}</span><em>{event.title}</em></button>;
+                return <button key={event.id} type="button" onClick={() => setActiveNode(event.id)} style={{ left: `${position.x}%`, top: `${position.y}%` }} className={`relation-node ${focused ? "relation-node-active" : related ? "relation-node-related" : ""}`} aria-pressed={focused} title={`${event.year} · ${event.title}`}><span>{event.year.match(/\d{3,4}/)?.[0] ?? "11C"}</span><em>{event.title}</em></button>;
               })}
             </div>
             <div className="mt-6 border-t border-[#28302e]/12 pt-5"><p className="font-mono text-[10px] tracking-[0.16em] text-[#4f8c85]">当前焦点 · {active?.year}</p><p className="mt-2 font-serif text-2xl font-bold">{active?.title}</p><p className="mt-2 text-sm leading-7 text-[#71817d]">高亮连线显示与此节点直接相关的历史议题。图谱用于梳理叙事关系，不以线条表达因果强度或历史重要性。</p></div>

@@ -231,3 +231,14 @@
 
 36. Harvard Center for Geographic Analysis, China Historical GIS：https://gis.harvard.edu/china-historical-gis
 37. Columbia University, Asia for Educators, Cities of the Song / Hangzhou：https://afe.easia.columbia.edu/songdynasty-module/cities-hangzhou.html
+
+### 地方锚点补充：府州县与基层细节
+
+Frontiers in Earth Science 关于杭州古城演变的研究指出，南宋时期临安作为都城与水系结构共同扩展；文中还记录1911年杭州府撤废、钱塘与仁和两县合并为杭州县的行政沿革。本站据此仅将“钱塘、仁和”作为临安府城内部的县级阅读标签，用于提示府城并非单一同质空间；不绘制两县边界，也不以它们代表完整的地方治理结构。
+
+同一研究提及船只为规避钱塘江航道风险，常先抵明州、再经浙东运河至杭州；因此新增“明州外港—浙东水网”是临安与港口之间的阅读关联，不是单一航程或固定路线复原。UNESCO 对大运河的说明可支持把水网理解为长期的粮食、原料与交通组织系统，但本站不把后世完整运河长度或格局回投为宋代精确地图。
+
+新增来源：
+
+38. Huang et al., *The evolution and construction of Shan-shui cities: evidence from the ancient city of Hangzhou*, Frontiers in Earth Science (2025)：https://www.frontiersin.org/journals/earth-science/articles/10.3389/feart.2025.1551117/full
+39. UNESCO World Heritage Centre, *The Grand Canal*：https://whc.unesco.org/en/list/1443/

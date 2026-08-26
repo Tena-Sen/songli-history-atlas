@@ -13,6 +13,7 @@ import { ParallelScrollTimeline } from "@/components/ParallelScrollTimeline";
 import { archiveYear, EXPANDED_SONG_ARCHIVE } from "@/lib/expandedSongArchive";
 import { EVENT_FACETS, eventIdsForZoom, eventMatchesFacets, HISTORY_FACETS, TIMELINE_ZOOMS, type HistoryFacet, type TimelineZoomId } from "@/lib/spatialExplorer";
 import { nextTimelineIndex } from "@/lib/timelineNavigation";
+import { makeTimelinePerspectiveUrl, readTimelinePerspective } from "@/lib/timelinePerspective";
 import {
   ArrowDownRight,
   ArrowUpRight,
@@ -23,6 +24,7 @@ import {
   Landmark,
   Moon,
   Search,
+  Share2,
   Sun,
   Waves,
   X,
@@ -200,14 +202,18 @@ function EventBadge({ tone }: { tone: TimelineEvent["tone"] }) {
 }
 
 export default function Home() {
-  const [filter, setFilter] = useState<Category>("全部");
-  const [selected, setSelected] = useState<TimelineEvent>(EVENTS[0]);
+  const [filter, setFilter] = useState<Category>(() => {
+    const category = readTimelinePerspective().category as Category;
+    return FILTERS.includes(category) ? category : "全部";
+  });
+  const [selected, setSelected] = useState<TimelineEvent>(() => EVENTS.find((item) => item.id === readTimelinePerspective().eventId) ?? EVENTS[0]);
   const [night, setNight] = useState(false);
-  const [query, setQuery] = useState("");
-  const [yearRange, setYearRange] = useState({ start: 960, end: 1279 });
-  const [zoom, setZoom] = useState<TimelineZoomId>("chapter");
-  const [activeFacets, setActiveFacets] = useState<HistoryFacet[]>([]);
+  const [query, setQuery] = useState(() => readTimelinePerspective().query);
+  const [yearRange, setYearRange] = useState(() => readTimelinePerspective().range);
+  const [zoom, setZoom] = useState<TimelineZoomId>(() => readTimelinePerspective().zoom);
+  const [activeFacets, setActiveFacets] = useState<HistoryFacet[]>(() => readTimelinePerspective().facets);
   const [timelineAnnouncement, setTimelineAnnouncement] = useState("使用方向键切换历史节点。");
+  const [perspectiveNotice, setPerspectiveNotice] = useState("");
 
   const visibleEvents = useMemo(() => {
     const normalized = query.trim();
@@ -228,6 +234,10 @@ export default function Home() {
   useEffect(() => {
     if (visibleEvents.length > 0 && !visibleEvents.some((event) => event.id === selected.id)) setSelected(visibleEvents[0]);
   }, [visibleEvents, selected.id]);
+
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent("songli:time-focus", { detail: { id: selected.id, year: archiveYear(selected.year) } }));
+  }, [selected]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -264,6 +274,25 @@ export default function Home() {
   }, [visibleEvents, selected.id, zoom]);
 
   const toggleFacet = (facet: HistoryFacet) => setActiveFacets((current) => current.includes(facet) ? current.filter((item) => item !== facet) : [...current, facet]);
+
+  const shareTimelinePerspective = async () => {
+    const url = makeTimelinePerspectiveUrl({ category: filter, zoom, facets: activeFacets, range: yearRange, query, eventId: selected.id });
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      const area = document.createElement("textarea");
+      area.value = url;
+      area.style.position = "fixed";
+      area.style.opacity = "0";
+      document.body.appendChild(area);
+      area.select();
+      document.execCommand("copy");
+      area.remove();
+    }
+    window.history.replaceState({}, "", url);
+    setPerspectiveNotice("已复制当前筛选、年份、密度与定位节点的阅读链接。");
+    window.setTimeout(() => setPerspectiveNotice(""), 2400);
+  };
 
   useEffect(() => {
     const handleChainSelection = (event: Event) => {
@@ -440,6 +469,8 @@ export default function Home() {
                   />
                 </label>
                 <label className="mt-6 block border-b border-[#28302e]/20 pb-2 text-[11px] text-[#71817d]">快速定位<select value={selected.id} onChange={(event) => { const target = visibleEvents.find((item) => item.id === event.target.value); if (target) { setSelected(target); setTimelineAnnouncement(`已定位至 ${target.year} · ${target.title}`); window.setTimeout(() => document.querySelector<HTMLElement>(`[data-event-id="${target.id}"]`)?.scrollIntoView({ behavior: "smooth", block: "center" }), 0); } }} className="mt-2 w-full bg-transparent text-sm text-[#53615d] outline-none night:text-[#c3c9c1]">{visibleEvents.map((event) => <option key={event.id} value={event.id}>{event.year} · {event.title}</option>)}</select></label>
+                <button type="button" onClick={shareTimelinePerspective} data-timeline-perspective-share className="mt-6 inline-flex items-center gap-2 border-b border-[#78a9a1] pb-1 text-xs text-[#397b74] transition hover:gap-3"><Share2 size={14} /> 复制当前筛选视角链接</button>
+                <p className="sr-only" aria-live="polite">{perspectiveNotice}</p>
                 <div className="mt-8 border-y border-[#28302e]/12 py-5">
                   <div className="flex items-center justify-between"><p className="font-mono text-[10px] tracking-[0.18em] text-[#4f8c85]">年份跨度</p><button type="button" onClick={() => setYearRange({ start: 960, end: 1279 })} className="text-[10px] text-[#71817d] underline underline-offset-4">重置</button></div>
                   <p className="mt-3 font-serif text-xl font-bold">{yearRange.start} — {yearRange.end}</p>
