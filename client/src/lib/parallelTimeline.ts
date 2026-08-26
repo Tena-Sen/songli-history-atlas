@@ -31,6 +31,13 @@ export type ParallelTrackItem = {
   personIds?: string[];
 };
 
+export type ParallelTrackComparison = {
+  trackId: ParallelTrackId;
+  mode: "both" | "left-only" | "right-only" | "empty";
+  leftItems: ParallelTrackItem[];
+  rightItems: ParallelTrackItem[];
+};
+
 export const PARALLEL_TRACKS: ParallelTrackDefinition[] = [
   { id: "politics", label: "政权转折", subtitle: "建宋、边境、断裂与承接", defaultVisible: true },
   { id: "city", label: "城市水路", subtitle: "东京、临安与沿海联系", defaultVisible: true },
@@ -94,4 +101,13 @@ export function firstEventForChapter(chapterId: ParallelChapterId) {
 export function visibleParallelItems(chapterId: ParallelChapterId, visibleTrackIds: ParallelTrackId[]) {
   const allowed = new Set(chapterEventIds(chapterId));
   return PARALLEL_TRACK_ITEMS.filter((item) => allowed.has(item.eventId) && visibleTrackIds.includes(item.trackId));
+}
+
+export function compareParallelTracks(leftEventId: string, rightEventId: string, trackIds: ParallelTrackId[] = DEFAULT_PARALLEL_TRACK_IDS): ParallelTrackComparison[] {
+  return trackIds.map((trackId) => {
+    const leftItems = PARALLEL_TRACK_ITEMS.filter((item) => item.trackId === trackId && item.eventId === leftEventId);
+    const rightItems = PARALLEL_TRACK_ITEMS.filter((item) => item.trackId === trackId && item.eventId === rightEventId);
+    const mode = leftItems.length > 0 && rightItems.length > 0 ? "both" : leftItems.length > 0 ? "left-only" : rightItems.length > 0 ? "right-only" : "empty";
+    return { trackId, mode, leftItems, rightItems };
+  });
 }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_PARALLEL_TRACK_IDS, visibleParallelItems } from "./parallelTimeline";
-import { decodeParallelTimelineUrl, initialParallelTimelineState, parallelTimelineReducer, pinAtMostTwo } from "./parallelTimelineMachine";
+import { compareParallelTracks, DEFAULT_PARALLEL_TRACK_IDS, visibleParallelItems } from "./parallelTimeline";
+import { decodeParallelTimelineUrl, encodeParallelTimelineUrl, initialParallelTimelineState, parallelTimelineReducer, pinAtMostTwo } from "./parallelTimelineMachine";
 
 describe("parallel timeline state machine", () => {
   it("defaults to the three readable tracks", () => {
@@ -29,5 +29,18 @@ describe("parallel timeline state machine", () => {
 
   it("drops invalid URL state instead of leaking unknown tracks", () => {
     expect(decodeParallelTimelineUrl("?parallelChapter=unknown&parallelTracks=city,invalid")).toEqual({ visibleTrackIds: ["city"] });
+  });
+
+  it("identifies per-track differences without treating them as causal links", () => {
+    const comparison = compareParallelTracks("chanyuan", "linan", ["politics", "city", "knowledge"]);
+    expect(comparison.map((item) => item.mode)).toEqual(["both", "both", "right-only"]);
+  });
+
+  it("preserves a maximum of two comparison nodes in a shareable URL", () => {
+    const originalWindow = globalThis.window;
+    Object.defineProperty(globalThis, "window", { configurable: true, value: { location: { search: "", pathname: "/", hash: "" } } });
+    const url = encodeParallelTimelineUrl({ ...initialParallelTimelineState, focusedEventId: "jingkang", pinnedEventIds: ["chanyuan", "jingkang"] });
+    expect(decodeParallelTimelineUrl(url.split("?")[1] ?? "")).toMatchObject({ focusedEventId: "jingkang", pinnedEventIds: ["chanyuan", "jingkang"] });
+    Object.defineProperty(globalThis, "window", { configurable: true, value: originalWindow });
   });
 });

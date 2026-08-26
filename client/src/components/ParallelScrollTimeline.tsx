@@ -2,11 +2,13 @@
  * 设计提醒｜并读卷轴：共同年份脊柱保持不动，轨道只是可选择的阅读层。
  * 条目与连线均指向本站阅读入口，不代表单一因果或影响力排序。
  */
-import { useEffect, useMemo, useReducer, useRef } from "react";
-import { ArrowUpRight, BookOpen, Check, ChevronDown, ChevronUp, MapPinned, Pin, UsersRound, X } from "lucide-react";
+import { useEffect, useMemo, useReducer, useRef, useState } from "react";
+import "./ParallelScrollTimeline.css";
+import { ArrowUpRight, BookOpen, Check, ChevronDown, ChevronUp, Copy, Link2, MapPinned, Pin, Share2, UsersRound, X } from "lucide-react";
 import { ATLAS_CITIES } from "@/lib/cityPeopleAtlas";
 import {
   chapterEventIds,
+  compareParallelTracks,
   PARALLEL_CHAPTERS,
   PARALLEL_TRACKS,
   type ParallelTimelineEvent,
@@ -31,8 +33,11 @@ function unique<T>(items: T[]) { return Array.from(new Set(items)); }
 
 export function ParallelScrollTimeline({ events }: Props) {
   const [state, dispatch] = useReducer(parallelTimelineReducer, initialParallelTimelineState);
+  const [ready, setReady] = useState(false);
+  const [shareStatus, setShareStatus] = useState("复制此刻的阅读状态");
   const hydrated = useRef(false);
   const folioHeadingRef = useRef<HTMLHeadingElement>(null);
+  const shareTimerRef = useRef<number | null>(null);
   const scopedEvents = useMemo(() => {
     const ids = chapterEventIds(state.chapterId);
     return events.filter((event) => ids.includes(event.id));
@@ -44,6 +49,14 @@ export function ParallelScrollTimeline({ events }: Props) {
   const folioPeople = unique(folioItems.flatMap((item) => item.personIds ?? [])).filter((id) => PERSON_NAMES[id]);
   const folioPlaces = unique(folioItems.flatMap((item) => item.placeIds ?? [])).map((id) => ATLAS_CITIES.find((city) => city.id === id)).filter(Boolean);
   const pinnedEvents = state.pinnedEventIds.map((id) => events.find((event) => event.id === id)).filter(Boolean) as ParallelTimelineEvent[];
+  const trackComparison = useMemo(() => pinnedEvents.length === 2 ? compareParallelTracks(pinnedEvents[0].id, pinnedEvents[1].id, state.visibleTrackIds) : [], [pinnedEvents, state.visibleTrackIds]);
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => setReady(true));
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
+
+  useEffect(() => () => { if (shareTimerRef.current) window.clearTimeout(shareTimerRef.current); }, []);
 
   useEffect(() => {
     if (hydrated.current) return;
@@ -54,7 +67,7 @@ export function ParallelScrollTimeline({ events }: Props) {
   useEffect(() => {
     if (!hydrated.current) return;
     window.history.replaceState({}, "", encodeParallelTimelineUrl(state));
-  }, [state.chapterId, state.visibleTrackIds, state.focusedEventId]);
+  }, [state.chapterId, state.visibleTrackIds, state.focusedEventId, state.pinnedEventIds]);
 
   useEffect(() => {
     const receiveExternalEvent = (event: Event) => {
@@ -96,6 +109,36 @@ export function ParallelScrollTimeline({ events }: Props) {
     if (next) focusEvent(next.id);
   };
 
+  const shareReadingState = async () => {
+    const url = new URL(encodeParallelTimelineUrl(state), window.location.origin).toString();
+    setShareStatus("正在复制当前阅读状态…");
+    const fallbackCopy = () => {
+      const input = document.createElement("textarea");
+      input.value = url;
+      input.style.position = "fixed";
+      input.style.opacity = "0";
+      document.body.appendChild(input);
+      input.select();
+      const copied = document.execCommand("copy");
+      input.remove();
+      if (!copied) throw new Error("copy command unavailable");
+    };
+    try {
+      if (navigator.clipboard?.writeText) {
+        const copied = await Promise.race([
+          navigator.clipboard.writeText(url).then(() => true).catch(() => false),
+          new Promise<boolean>((resolve) => window.setTimeout(() => resolve(false), 220)),
+        ]);
+        if (!copied) fallbackCopy();
+      } else fallbackCopy();
+      setShareStatus("阅读链接已复制，可分享当前章节、轨道与对照节点。");
+    } catch {
+      setShareStatus("浏览器未授予剪贴板权限；可从地址栏复制当前阅读状态。");
+    }
+    if (shareTimerRef.current) window.clearTimeout(shareTimerRef.current);
+    shareTimerRef.current = window.setTimeout(() => setShareStatus("复制此刻的阅读状态"), 3600);
+  };
+
   return (
     <section id="parallel-scroll" data-parallel-timeline className="parallel-scroll border-y border-[#28302e]/10 bg-[#e9e7db]/50 night:bg-[#111d20]" onKeyDown={onTimelineKeyDown}>
       <div className="mx-auto max-w-[1440px] px-6 py-20 md:px-12 lg:px-20 lg:py-28">
@@ -124,9 +167,14 @@ export function ParallelScrollTimeline({ events }: Props) {
               })}
             </div>
           </div>
+          <div className="parallel-share-control">
+            <button type="button" onClick={shareReadingState} className="parallel-share-button"><Share2 size={14} strokeWidth={1.5} />复制阅读链接</button>
+            <p className="parallel-share-note"><Link2 size={12} />章节、轨道、年份与案头对照会一并写入链接。</p>
+            <p className="sr-only" aria-live="polite" data-parallel-share-status>{shareStatus}</p>
+          </div>
         </div>
 
-        <div className="parallel-sheet mt-10">
+        <div className={`parallel-sheet mt-10 ${ready ? "parallel-ready" : ""}`}>
           <div className="parallel-sheet-note"><span>共同年份脊柱</span><span>↑ ↓ 切换年份 · Enter 打开同年册页 · Escape 返回</span></div>
           <div className="parallel-canvas" style={{ gridTemplateColumns: `132px repeat(${Math.max(visibleTracks.length, 1)}, minmax(180px, 1fr))` }}>
             <div className="parallel-year-spine" style={{ "--parallel-years": scopedEvents.length } as React.CSSProperties} role="listbox" aria-label="并读卷轴年份脊柱" aria-activedescendant={`parallel-year-${state.focusedEventId}`}>
@@ -143,7 +191,7 @@ export function ParallelScrollTimeline({ events }: Props) {
           <p className="parallel-boundary">条目只基于站内已核验事件、人物与城市资料生成；同一列的并列不意味着这些线索间存在确定的因果链。</p>
         </div>
 
-        {folioEvent && <section className="parallel-folio mt-10" aria-label={`${folioEvent.year} ${folioEvent.title} 同年册页`}>
+        {folioEvent && <section key={folioEvent.id} className="parallel-folio parallel-folio-enter mt-10" aria-label={`${folioEvent.year} ${folioEvent.title} 同年册页`}>
           <div className="parallel-folio-spine"><span>{folioEvent.year}</span><i className={folioEvent.tone === "seal" ? "parallel-folio-seal" : ""} /></div>
           <div className="parallel-folio-main">
             <div className="flex items-start justify-between gap-6"><div><p className="eyebrow">同年展开笺</p><h3 ref={folioHeadingRef} tabIndex={-1} className="mt-3 font-serif text-3xl font-black tracking-[-.05em] outline-none md:text-4xl">{folioEvent.title}</h3></div><button type="button" onClick={() => { dispatch({ type: "CLOSE_FOLIO" }); focusEvent(state.focusedEventId); }} className="parallel-folio-close" aria-label="关闭同年册页"><X size={16} /></button></div>
@@ -157,7 +205,9 @@ export function ParallelScrollTimeline({ events }: Props) {
           </div>
         </section>}
 
-        {pinnedEvents.length > 0 && <section className="parallel-desk mt-8" aria-label="置于案头的节点比较"><div className="parallel-desk-head"><p className="eyebrow">置于案头</p><p>最多保留两项；并读摘要不自动推出历史结论。</p></div><div className="parallel-desk-items">{pinnedEvents.map((event) => <article key={event.id} className="parallel-desk-item"><div className="flex items-start justify-between gap-4"><p className="font-mono text-[11px] tracking-[.15em] text-[#4f8c85]">{event.year}</p><button type="button" onClick={() => dispatch({ type: "UNPIN_EVENT", eventId: event.id })} className="parallel-desk-remove" aria-label={`移除 ${event.title}`}><X size={14} /></button></div><h3 className="mt-3 font-serif text-2xl font-bold tracking-[-.04em]">{event.title}</h3><p className="mt-3 text-sm leading-7 text-[#71817d]">{event.short}</p><div className="mt-5 flex flex-wrap gap-2">{PARALLEL_TRACKS.filter((track) => trackItems.some((item) => item.eventId === event.id && item.trackId === track.id)).map((track) => <span key={track.id} className="parallel-desk-track">{track.label}</span>)}</div></article>)}</div></section>}
+        {pinnedEvents.length > 0 && <section className="parallel-desk mt-8" aria-label="置于案头的节点比较"><div className="parallel-desk-head"><p className="eyebrow">置于案头</p><p>最多保留两项；并读摘要不自动推出历史结论。</p></div><div className="parallel-desk-items">{pinnedEvents.map((event) => <article key={event.id} className="parallel-desk-item"><div className="flex items-start justify-between gap-4"><p className="font-mono text-[11px] tracking-[.15em] text-[#4f8c85]">{event.year}</p><button type="button" onClick={() => dispatch({ type: "UNPIN_EVENT", eventId: event.id })} className="parallel-desk-remove" aria-label={`移除 ${event.title}`}><X size={14} /></button></div><h3 className="mt-3 font-serif text-2xl font-bold tracking-[-.04em]">{event.title}</h3><p className="mt-3 text-sm leading-7 text-[#71817d]">{event.short}</p><div className="mt-5 flex flex-wrap gap-2">{PARALLEL_TRACKS.filter((track) => trackItems.some((item) => item.eventId === event.id && item.trackId === track.id)).map((track) => <span key={track.id} className="parallel-desk-track">{track.label}</span>)}</div></article>)}</div>
+          {pinnedEvents.length === 2 && <div className="parallel-difference"><div className="parallel-difference-head"><div><p className="eyebrow">逐轨差异高亮</p><h3 className="mt-2 font-serif text-2xl font-bold tracking-[-.04em]">两节点在哪些轨道上同时出现，哪些只在一侧留下线索？</h3></div><span><Copy size={13} />基于站内条目覆盖，不代表因果或重要性</span></div><div className="parallel-difference-grid">{trackComparison.map((comparison) => { const track = PARALLEL_TRACKS.find((item) => item.id === comparison.trackId); const left = comparison.leftItems.map((item) => item.label).join("；"); const right = comparison.rightItems.map((item) => item.label).join("；"); return <article key={comparison.trackId} className={`parallel-difference-row parallel-difference-${comparison.mode}`}><div className="parallel-difference-track"><span>{track?.label}</span><small>{comparison.mode === "both" ? "两侧均有线索" : comparison.mode === "left-only" ? "仅左侧出现" : comparison.mode === "right-only" ? "仅右侧出现" : "暂无条目"}</small></div><p className={comparison.mode === "right-only" ? "parallel-difference-muted" : ""}>{left || "—"}</p><p className={comparison.mode === "left-only" ? "parallel-difference-muted" : ""}>{right || "—"}</p></article>; })}</div><p className="parallel-difference-boundary">高亮只帮助读者辨认本站现有主题入口的“同时出现”与“单侧出现”；它不衡量历史重要性，也不推导因果关系。</p></div>}
+        </section>}
       </div>
     </section>
   );

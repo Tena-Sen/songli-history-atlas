@@ -82,10 +82,12 @@ export function decodeParallelTimelineUrl(search: string): Partial<ParallelTimel
   const validTracks: ParallelTrackId[] = ["politics", "city", "people", "institution", "knowledge"];
   const parsedTracks = (params.get("parallelTracks") ?? "").split(",").filter((track): track is ParallelTrackId => validTracks.includes(track as ParallelTrackId));
   const eventId = params.get("parallelEvent");
+  const pinnedEventIds = (params.get("parallelPins") ?? "").split(",").filter(Boolean).slice(-2);
   return {
     ...(chapterId && validChapters.includes(chapterId) ? { chapterId } : {}),
     ...(parsedTracks.length > 0 ? { visibleTrackIds: parsedTracks } : {}),
     ...(eventId ? { focusedEventId: eventId } : {}),
+    ...(pinnedEventIds.length > 0 ? { pinnedEventIds } : {}),
   };
 }
 
@@ -94,5 +96,7 @@ export function encodeParallelTimelineUrl(state: ParallelTimelineState) {
   params.set("parallelChapter", state.chapterId);
   params.set("parallelTracks", state.visibleTrackIds.join(","));
   params.set("parallelEvent", state.focusedEventId);
+  if (state.pinnedEventIds.length > 0) params.set("parallelPins", state.pinnedEventIds.join(","));
+  else params.delete("parallelPins");
   return `${window.location.pathname}?${params.toString()}${window.location.hash}`;
 }
