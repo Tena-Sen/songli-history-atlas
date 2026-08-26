@@ -1,0 +1,251 @@
+export type SongArchiveCategory = "政权" | "外交" | "技术" | "制度" | "城市" | "转折";
+
+export type ExpandedSongArchiveEntry = {
+  id: string;
+  year: string;
+  title: string;
+  short: string;
+  detail: string;
+  category: SongArchiveCategory;
+  tag: string;
+  source: string;
+  sourceUrl: string;
+  tone: "celadon" | "seal" | "ink";
+  excerpt: string;
+  excerptWork: string;
+  excerptNote: string;
+  context: string[];
+  cityIds?: string[];
+};
+
+/**
+ * 史料扩展原则：此表以大学、博物馆与学术出版物的公开说明为导读依据。
+ * 除明确标示的原典节点外，excerpt 是资料转述，不伪装成古籍逐字引文。
+ */
+export const EXPANDED_SONG_ARCHIVE: ExpandedSongArchiveEntry[] = [
+  {
+    id: "champa-rice",
+    year: "1012",
+    title: "占城稻进入江淮",
+    short: "早熟、耐旱稻种进入江淮，生产与水路腹地开始被重新连接。",
+    detail: "至1012年，来自占城的早熟稻已传入长江下游和淮河流域。它与灌溉、复种、江南水网和区域分工共同构成宋代农业变化的背景，而不是单一品种决定一切的故事。",
+    category: "技术",
+    tag: "农政与水网",
+    source: "哥伦比亚大学 Asia for Educators",
+    sourceUrl: "https://afe.easia.columbia.edu/songdynasty-module/tech-rice.html",
+    tone: "celadon",
+    excerpt: "“至1012年，早熟稻已传入长江下游和淮河流域。”",
+    excerptWork: "哥伦比亚大学宋代稻作专题（资料转述）",
+    excerptNote: "依据专题所引研究的中文转述；并非古籍原文逐字引句。",
+    context: ["早熟、耐旱品种与水利、耕作方式共同影响产量。", "长江流域在宋代逐渐成为中国经济重心。", "本站将其与城市、运输和粮食供给并读，不将其化约为人口增长的唯一原因。"],
+  },
+  {
+    id: "qingli-war",
+    year: "1040—1044",
+    title: "庆历战争：西北边境承压",
+    short: "宋与西夏的战争使边境、防务与财政再次进入朝廷中心。",
+    detail: "剑桥研究将1040—1044年的庆历战争置于澶渊之后的多国边境秩序中。战争暴露出的并非单一军事实力问题，而是防务、地方治理、财力与朝廷判断彼此纠缠的压力。",
+    category: "外交",
+    tag: "西北边境",
+    source: "Cambridge University Press · Journal of Chinese History",
+    sourceUrl: "https://www.cambridge.org/core/journals/journal-of-chinese-history/article/fragility-of-peace-song-chinas-northwestern-frontier-and-erosion-of-the-chanyuan-paradigm-in-the-mideleventh-century/AF2F19A32A23ED0F304C3DE814851A3F",
+    tone: "ink",
+    excerpt: "“庆历战争（1040—1044）使既有的边境和平安排受到考验。”",
+    excerptWork: "Paul Jakov Smith，剑桥开放研究（资料转述）",
+    excerptNote: "依据研究摘要与正文的中文转述；本站不以单一战役解释北宋之后的命运。",
+    context: ["澶渊后的边境稳定并非没有新压力。", "西北军政与财政问题也进入改革讨论。", "可与庆历改革、熙宁新法和北宋后期的边境转向连续阅读。"],
+  },
+  {
+    id: "qingli-reforms",
+    year: "1043—1045",
+    title: "庆历改革：战时的行政整饬",
+    short: "范仲淹等人试图整饬官僚与教育，改革随政治局势很快受挫。",
+    detail: "庆历改革发生在西北战事的压力中。它把官僚整饬、考试与地方治理推上朝廷案头，也说明北宋的改革问题在熙宁之前已有重要前史。",
+    category: "制度",
+    tag: "改革前史",
+    source: "Cambridge University Press · Journal of Chinese History",
+    sourceUrl: "https://www.cambridge.org/core/journals/journal-of-chinese-history/article/fragility-of-peace-song-chinas-northwestern-frontier-and-erosion-of-the-chanyuan-paradigm-in-the-mideleventh-century/AF2F19A32A23ED0F304C3DE814851A3F",
+    tone: "celadon",
+    excerpt: "“1043年起，战时的行政改革被置入朝廷决策。”",
+    excerptWork: "Paul Jakov Smith，剑桥开放研究（资料转述）",
+    excerptNote: "以研究对仁宗朝改革背景的说明作导读，不将改革成败归为单一人物意志。",
+    context: ["边境战事与行政整饬在此交会。", "1045年前后，改革措施和改革者均遭遇政治挫折。", "此节点是理解1069年熙宁新法的重要前史。"],
+    cityIds: ["dongjing"],
+  },
+  {
+    id: "wujing-zongyao",
+    year: "1044",
+    title: "《武经总要》：军技写入书册",
+    short: "军事手册记录火药配方，技术、文献与防务在此同页出现。",
+    detail: "1044年的《武经总要》记录了最早的真正火药配方，并讨论其规模化制造。这个节点不把技术当作“决定胜负”的答案，而是提示军技、工艺、书写和战争长期相互塑造。",
+    category: "技术",
+    tag: "军事技术",
+    source: "哥伦比亚大学 Asia for Educators",
+    sourceUrl: "https://afe.easia.columbia.edu/songdynasty-module/tech-gunpowder.html",
+    tone: "celadon",
+    excerpt: "“1044年的《武经总要》记录了真正的火药配方。”",
+    excerptWork: "哥伦比亚大学宋代火药专题（资料转述）",
+    excerptNote: "基于大学专题的中文转述；原书版本与后世刊本差异需由兵书研究进一步核对。",
+    context: ["宋代火药最初多用于攻城与火攻。", "技术知识既存在于工艺实践，也被写入军事文本。", "可与铁业、印刷和13世纪军事技术并读。"],
+  },
+  {
+    id: "iron-production",
+    year: "1078",
+    title: "铁业与炭煤：生产的尺度",
+    short: "铁产量达到约12.5万吨，工业、军需与日常器用形成更大网络。",
+    detail: "哥伦比亚大学专题以1078年约12.5万吨铁产量为宋代重工业增长的观察点。铁用于农具、桥梁、器物与军需；到11世纪末，煤炭在铁业中大体替代木炭。",
+    category: "技术",
+    tag: "工业与资源",
+    source: "哥伦比亚大学 Asia for Educators",
+    sourceUrl: "https://afe.easia.columbia.edu/songdynasty-module/econ-rev-iron-steel.html",
+    tone: "celadon",
+    excerpt: "“1078年，铁产量约为12.5万吨。”",
+    excerptWork: "哥伦比亚大学宋代铁业专题（资料转述）",
+    excerptNote: "数值为专题采用的估算口径；仅作生产规模的比较线索，不折算为国家实力排名。",
+    context: ["铁器进入农具、桥梁、宗教造像与兵器等多种场景。", "水力鼓风与高温冶炼改变了生产组织。", "资源替代也提示技术史与生态、城市消费的关联。"],
+  },
+  {
+    id: "huizong-art",
+    year: "1100—1125",
+    title: "徽宗与画院：宫廷文化的高点",
+    short: "皇帝直接参与艺术方向，画院与宫廷视觉文化达到高峰。",
+    detail: "大都会博物馆指出，徽宗在位时宫廷赞助与皇帝直接参与艺术方向达到高点。这个节点将政治、物质文化和艺术制度并置，但不以文化成就冲淡或解释之后的北方危局。",
+    category: "制度",
+    tag: "宫廷文化",
+    source: "大都会艺术博物馆 · 北宋专题",
+    sourceUrl: "https://www.metmuseum.org/essays/northern-song-dynasty-960-1127",
+    tone: "ink",
+    excerpt: "“徽宗在位时，宫廷赞助与皇帝直接参与艺术方向达到高点。”",
+    excerptWork: "大都会艺术博物馆北宋专题（资料转述）",
+    excerptNote: "基于博物馆专题的中文转述；以艺术制度为阅读切口，不作政治评价替代。",
+    context: ["北宋画院延续并发展了宫廷绘画制度。", "文人士大夫的艺术实践也与官僚政治和个人表达交织。", "本页建议与东京城市、知识传播和靖康节点并读。"],
+    cityIds: ["dongjing"],
+  },
+  {
+    id: "jin-rise",
+    year: "1115",
+    title: "金朝建立：北方格局再变",
+    short: "女真建立金朝，辽、宋、金之间的关系开始重新排列。",
+    detail: "金朝建立于1115年。它在12世纪早期击败辽，并在之后把宋逐出华北。本站以此提示北方政治不是单一的宋辽关系，而是多方国家、联盟和边境利益持续变动的格局。",
+    category: "外交",
+    tag: "多国格局",
+    source: "哥伦比亚大学 Asia for Educators",
+    sourceUrl: "https://afe.easia.columbia.edu/songdynasty-module/outside-rivals.html",
+    tone: "ink",
+    excerpt: "“金朝（1115—1234）在12世纪早期击败辽。”",
+    excerptWork: "哥伦比亚大学北方对手专题（资料转述）",
+    excerptNote: "以专题年代框架为导读；具体联盟、战役和条约须进入对应研究页面继续核验。",
+    context: ["宋代始终处在多个北方政权并存的环境中。", "马匹、草原与边境地理影响军事条件。", "本站把它置于靖康前的长期背景，而非唯一原因。"],
+    cityIds: ["dongjing"],
+  },
+  {
+    id: "southern-sea-routes",
+    year: "12世纪",
+    title: "南方海路：面向海洋的网络",
+    short: "从12世纪起，海洋能力持续发展，港口与腹地的关系被重新组织。",
+    detail: "随着南方地位上升，中国面向南海、印度洋及其间区域的海洋能力自12世纪起持续发展。它连接了港口、船舶、货物、财政与沿海城市，却不能被简化为一条孤立的“贸易繁荣线”。",
+    category: "城市",
+    tag: "水路与海洋",
+    source: "哥伦比亚大学 Asia for Educators",
+    sourceUrl: "https://afe.easia.columbia.edu/songdynasty-module/outside-trade.html",
+    tone: "celadon",
+    excerpt: "“中国的海洋能力从12世纪起持续发展。”",
+    excerptWork: "哥伦比亚大学宋代对外贸易专题（资料转述）",
+    excerptNote: "基于专题所引研究的中文转述；本页不使用缺少来源支撑的贸易规模或航线数值。",
+    context: ["宋代海贸与边境陆路贸易同时存在。", "泉州、明州等港口是城市、水路和市场网络的阅读入口。", "该节点可与临安、赵汝适和1277年海船考古切片联读。"],
+    cityIds: ["mingzhou", "quanzhou"],
+  },
+  {
+    id: "zhu-xi",
+    year: "1130—1200",
+    title: "朱熹与新儒学：格物与秩序",
+    short: "哲学、教育与士人实践在南宋获得新的持续性。",
+    detail: "朱熹的生平横跨南宋大部分时期。大都会博物馆以“格物致知”概括其重要关切；本站把这一人物—思想切片放入教育、书籍与士人实践的长时段中，不把思想史缩为单次政令。",
+    category: "制度",
+    tag: "思想与教育",
+    source: "大都会艺术博物馆 · 南宋专题",
+    sourceUrl: "https://www.metmuseum.org/essays/southern-song-dynasty-1127-1279",
+    tone: "celadon",
+    excerpt: "“朱熹（1130—1200）关注格物致知。”",
+    excerptWork: "大都会艺术博物馆南宋专题（资料转述）",
+    excerptNote: "以博物馆专题的概述为导读；思想概念与著作版本需在专门研究中进一步展开。",
+    context: ["宋代科举与士大夫文化提供了思想传播的制度环境。", "新儒学的后续影响延伸至宋以后。", "可与印刷、临安城市文化和书籍传播并读。"],
+  },
+  {
+    id: "zhu-fan-zhi",
+    year: "1225",
+    title: "《诸蕃志》：泉州写下海贸世界",
+    short: "市舶司官员赵汝适记录中国商人与多地的货物与城市。",
+    detail: "1225年，泉州市舶司官员赵汝适写成《诸蕃志》，记录中国商人所接触的贸易地区和货物。它让港口、制度、知识记录与跨海网络在同一册书中相遇。",
+    category: "城市",
+    tag: "泉州与市舶",
+    source: "哥伦比亚大学 Asia for Educators",
+    sourceUrl: "https://afe.easia.columbia.edu/songdynasty-module/outside-trade.html",
+    tone: "celadon",
+    excerpt: "“1225年，泉州市舶司官员赵汝适写成《诸蕃志》。”",
+    excerptWork: "哥伦比亚大学宋代对外贸易专题（资料转述）",
+    excerptNote: "资料转述；书名、人物与年份可作为延伸至原典和港口史研究的索引。",
+    context: ["海贸涉及货物、城市、商人、航海技术与政府管理。", "泉州是宋代重要港口，但不是所有沿海经验的代名词。", "赵汝适在本站仅作为海贸文献的阅读人物入口。"],
+    cityIds: ["quanzhou"],
+  },
+  {
+    id: "linan-societies",
+    year: "1235",
+    title: "西湖社团：临安城市的日常",
+    short: "一条1235年的记录，让诗社、茶会与城市社交浮出水面。",
+    detail: "哥伦比亚大学引述一条写于1235年的文本，其中可见西湖诗社、佛教茶会等团体。它不提供全城统计，却让临安的城市精英社交、兴趣与文化消费成为可追问的微观切片。",
+    category: "城市",
+    tag: "城市社交",
+    source: "哥伦比亚大学 Asia for Educators",
+    sourceUrl: "https://afe.easia.columbia.edu/songdynasty-module/cities-hangzhou.html",
+    tone: "celadon",
+    excerpt: "“1235年的文本提到西湖诗社、佛教茶会等团体。”",
+    excerptWork: "哥伦比亚大学临安城市专题（资料转述）",
+    excerptNote: "以专题引述的文本为切片；不将城市精英活动外推为全部居民的生活。",
+    context: ["临安位于大运河南端，是重要贸易中心。", "城市生活包含市场、交通、宗教和社交网络。", "可与临安行在、南宋艺术和海贸港口并读。"],
+    cityIds: ["linan"],
+  },
+  {
+    id: "jin-end",
+    year: "1234",
+    title: "金朝终结：北方政局再转",
+    short: "金朝的终结改变了南宋北方的政治与军事环境。",
+    detail: "哥伦比亚大学将金朝标为1115—1234，并说明其后蒙古势力继续南下、最终征服宋。本站把1234年作为北方政治格局转换的节点，不将后续南宋危局归结为一个单年结果。",
+    category: "外交",
+    tag: "北方再转",
+    source: "哥伦比亚大学 Asia for Educators",
+    sourceUrl: "https://afe.easia.columbia.edu/songdynasty-module/outside-rivals.html",
+    tone: "ink",
+    excerpt: "“金朝的年代为1115—1234。”",
+    excerptWork: "哥伦比亚大学北方对手专题（资料转述）",
+    excerptNote: "按专题时间框架设置节点；宋蒙关系和后续战争细节应连接专门研究继续阅读。",
+    context: ["北宋之后，南宋仍在多方政治格局中调整。", "北方政权转换改变了边境和军事压力的条件。", "临安、沿海城市和宋末人物线索可显示南方社会的持续性。"],
+  },
+  {
+    id: "song-shipwreck",
+    year: "1277",
+    title: "南海沉船：宋末海贸的考古切片",
+    short: "失事海船留下货物与舱壁，让宋末海上网络可被考古追问。",
+    detail: "哥伦比亚大学专题提到，一艘宋代海船于1277年失事，后被发掘出来自东南亚与非洲等地的货物痕迹。它是宋末海贸仍在运作的一条考古切片，不代表所有港口或全部贸易规模。",
+    category: "城市",
+    tag: "海贸考古",
+    source: "哥伦比亚大学 Asia for Educators",
+    sourceUrl: "https://afe.easia.columbia.edu/songdynasty-module/outside-trade.html",
+    tone: "celadon",
+    excerpt: "“一艘宋代海船于1277年失事，船货留下跨海贸易痕迹。”",
+    excerptWork: "哥伦比亚大学宋代对外贸易专题（资料转述）",
+    excerptNote: "以专题所述考古发现作导读；不将单艘沉船的载货外推为整个宋代贸易总量。",
+    context: ["海上贸易有高收益，也伴随航行风险与分散投资。", "宋末政局收缩时，沿海与海上网络仍是重要历史场景。", "可与泉州、《诸蕃志》、临安失守和1279终局连续阅读。"],
+    cityIds: ["quanzhou"],
+  },
+];
+
+export function archiveYear(year: string) {
+  if (year.includes("11世纪")) return 1040;
+  if (year.includes("12世纪")) return 1160;
+  return Number(year.match(/\d{3,4}/)?.[0] ?? 960);
+}
+
+export function archiveEntriesForCity(cityId: string) {
+  return EXPANDED_SONG_ARCHIVE.filter((entry) => entry.cityIds?.includes(cityId));
+}

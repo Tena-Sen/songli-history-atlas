@@ -144,3 +144,74 @@
 - **Histography**：页面自称将维基百科历史事件转为“每个点均为历史事件”的长跨度交互时间轴，并按地质/历史时代分段导航；当前页面仍提示不支持移动设备。可借鉴其缩放后渐进显露事件密度的原则，但宋历不可照搬“数据点即史实”的弱来源表现，须保持精选节点、来源和移动端可读性。来源：https://histography.io/
 - **OldMapsOnline TimeMap**：其历史区域页面使用以地图为中心的浏览入口，但当前页面在自动化环境中未完整加载资料内容。可作为“地图优先、历史图像为核心”的视觉取向参考；不建议将其加载不稳定的重型地图体验作为宋历的默认路径。来源：https://www.oldmapsonline.org/en/history/regions
 - **OpenHistoricalMap**：官网自述为由公众创建、面向公共领域的全球互动历史地图；界面提供日期范围、单日期滑块、按日/月/年/十年/百年步进和播放控制。可借鉴“时间范围 + 粒度步进”控件语言，宋历则应限定在已有的两宋年份范围并仍以核验史料为准。来源：https://www.openhistoricalmap.org/
+
+## 两宋三百年史料网络扩展：覆盖基线（2026-08-26）
+
+- 哥伦比亚大学中国历史时间线将宋代划分为北宋（960—1127，首都汴京/今开封）与南宋（1127—1279，首都临安/今杭州），并以经济货币化、商业与海贸增长、城市扩展、技术创新以及新儒学与科举制度的后世影响概括这一时期。该框架支持网站由“八个转折点”扩展为政权、制度、城市、生产技术、思想文化与对外关系的多轨连续节点，而非只补充王朝兴亡。
+- 哥伦比亚大学宋代专题将农业、铁业、印刷、人口与城市、竞争性考试、北方邻国和贸易网络并列为理解宋代的重要主题；专题也说明北宋阶段经济增长涉及商业化、城市化与工业化。本站可据此设置六类扩展轨道，但每个具体年份、人物、原典短摘仍须另行核验，不能以总论直接替代事件证据。
+- 内容层级采用三层：**主脊柱**保留政权分期与重大转折；**中观节点**补充改革、战争、条约、财政与城市变化；**微观切片**以人物、城市、技术、古籍短摘或制度术语进入。关系线只指向阅读入口；不将并列发生、资料覆盖或轨道差异叙述成单一因果。
+- 史料准则：优先使用可访问的原典开放文本、大学/博物馆教学资料与同行出版社专题；无法逐字核验的原典只提供卷次或延伸阅读链接；对争议性、复杂性强的事件采用说明性短述并标明来源，不以单条叙事下结论。
+
+新增来源：
+
+22. Columbia University, Asia for Educators, Timeline of Chinese Historical Periods and Dynasties：https://afe.easia.columbia.edu/timelines/china_timeline.htm
+23. Columbia University, Asia for Educators, Song Dynasty China: China in 1000 CE：https://afe.easia.columbia.edu/songdynasty-module/
+
+### 北宋中前期可扩展节点（核验草案）
+
+| 时间 | 拟扩展节点 | 已核验的谨慎表述 | 主题轨道 | 来源边界 |
+| --- | --- | --- | --- | --- |
+| 1012 | 占城稻进入江淮 | 哥伦比亚大学引述资料称，早熟耐旱稻至1012年已传入长江下游和淮河流域；可说明其与复种、南方农业和区域分工的关系，不将单一品种直接写成全部人口增长的唯一原因。 | 生产、城市水路 | Columbia 稻作专题 |
+| 1040—1044 | 庆历战争与西北边境 | 剑桥研究将其称为北宋与党项西夏的庆历战争，并说明它处于澶渊后边境秩序与中期政治讨论的背景中；本站应描述为“边境压力与军政财政议题加重”，而非简单叙述为一场决定性败战。 | 边境、制度 | Cambridge 开放研究 |
+| 1043—1045 | 庆历改革 | 剑桥研究显示仁宗在战争背景下委任范仲淹等推动重要改革方案，至1045年相关改革者被逐出京师、措施夭折。本站需将其读作战争、行政整饬和官僚政治的交汇，而不与后来的熙宁新法混同。 | 制度、人物 | Cambridge 开放研究 |
+| 11世纪 | 科举与士大夫群体 | 哥伦比亚大学说明，宋代竞争性考试使士大夫群体充分发展，并成为通常的仕进阶梯；可用作长期制度轨节点，不应编造单一“创制年”。 | 制度、知识 | Columbia 儒者专题 |
+| 1078 | 铁业规模与军民生产 | 哥伦比亚大学给出1078年铁产量约12.5万吨、较800年约增六倍的表述；可用作工业生产节点，并说明铁用于农具、桥梁、兵器等多种场景，避免直接推导为军力优劣。 | 生产、技术 | Columbia 铁业专题 |
+| 11世纪末 | 煤炭替代木炭 | 哥伦比亚大学说明至11世纪末煤炭在铁业中大体替代木炭；适合作为资源与技术的长期变化节点，不标为精确单年事件。 | 生产、技术 | Columbia 铁业专题 |
+| 11—12世纪 | 东京城市生活 | 哥伦比亚大学说明宋代城市增长、开封与杭州均被认为约有百万人口，市场、店铺、餐馆与街道生活相互交织；可作为城市轨的时期性切片，须在说明中注明人口为“学界估计/约数”。 | 城市、社会 | Columbia 城市专题 |
+
+新增来源：
+
+24. Columbia University, Asia for Educators, Scholar-Officials and the Examination System：https://afe.easia.columbia.edu/songdynasty-module/confucian-scholar.html
+25. Columbia University, Asia for Educators, Rice Cultivation：https://afe.easia.columbia.edu/songdynasty-module/tech-rice.html
+26. Columbia University, Asia for Educators, Iron and Steel：https://afe.easia.columbia.edu/songdynasty-module/econ-rev-iron-steel.html
+27. Columbia University, Asia for Educators, Cities of the Song：https://afe.easia.columbia.edu/songdynasty-module/cities-new.html
+28. Paul Jakov Smith, “The Fragility of Peace: Song China’s Northwestern Frontier and Erosion of the Chanyuan Paradigm in the Mid-Eleventh Century,” *Journal of Chinese History*（开放获取）：https://www.cambridge.org/core/journals/journal-of-chinese-history/article/fragility-of-peace-song-chinas-northwestern-frontier-and-erosion-of-the-chanyuan-paradigm-in-the-mideleventh-century/AF2F19A32A23ED0F304C3DE814851A3F
+
+### 北宋晚期与靖康前可扩展节点（核验草案）
+
+| 时间 | 拟扩展节点 | 已核验的谨慎表述 | 主题轨道 | 来源边界 |
+| --- | --- | --- | --- | --- |
+| 1044 | 《武经总要》与火药配方 | 哥伦比亚大学说明1044年《武经总要》记录最早的真正火药配方并讨论规模化制造；可作为军事技术与知识记录节点，不能由此推断宋军因技术领先必然获胜。 | 技术、边境 | Columbia 火药专题 |
+| 1068—1122 | 北方边境政策的转向 | 剑桥研究把1068年起的扩张性战争与1122年收复燕云尝试放入一条更长的政策变化中；本站将其显示为“边境治理与战略选择持续变化”，不把任何单项选择写成靖康唯一原因。 | 边境、制度 | Cambridge 开放研究 |
+| 1100—1125 | 徽宗时期的宫廷艺术 | 大都会博物馆说明徽宗在位时，宫廷赞助与皇帝直接参与艺术方向达到高点；可用作政治与视觉文化并读切片，不以艺术成就抵消或解释之后的政治危机。 | 知识、人物 | The Met 北宋专题 |
+| 1115 | 金朝建立 | 哥伦比亚大学将金朝标为1115—1234，并说明其在12世纪早期击败辽后将宋逐出华北；本站以其作为东北—北方格局变化节点，不补入未经本轮核验的战役细节。 | 边境、政权 | Columbia 北方对手专题 |
+| 1120年代 | 联辽灭金前后的多方关系 | 剑桥研究说明中期之后边境格局、政治竞争与联盟变化共同削弱既有和平框架；网站只使用“多方格局与战略选择”的阅读线索，明确拒绝单因果解释北宋覆亡。 | 边境、政权 | Cambridge 开放研究 |
+| 1125—1127 | 金军南下与北宋危局 | 哥伦比亚大学概述金在击败辽后将宋逐出华北；本站继续将东京危局、政权南迁与先前的边境变化并置，但每个具体军政细节须在原典或专题研究中再补证。 | 政权、城市、人物 | Columbia 北方对手专题 |
+
+新增来源：
+
+29. Columbia University, Asia for Educators, Northern Rivals: Liao, Jin, Xi Xia, and the Mongols：https://afe.easia.columbia.edu/songdynasty-module/outside-rivals.html
+30. Columbia University, Asia for Educators, Gunpowder：https://afe.easia.columbia.edu/songdynasty-module/tech-gunpowder.html
+31. The Metropolitan Museum of Art, Northern Song Dynasty (960–1127)：https://www.metmuseum.org/essays/northern-song-dynasty-960-1127
+
+### 南宋前中后期可扩展节点（核验草案）
+
+| 时间 | 拟扩展节点 | 已核验的谨慎表述 | 主题轨道 | 来源边界 |
+| --- | --- | --- | --- | --- |
+| 1127 | 南宋政权在杭州重建 | 大都会博物馆说明金军入侵并夺取汴梁后，宋廷在杭州重建并作为南宋延续约150年；本站保持1127为政权分界，1138另作临安行在的行政节点。 | 政权、城市 | The Met 南宋专题 |
+| 12世纪 | 临安的山水、宫廷与工艺 | 大都会博物馆说明杭州及西湖景观影响南宋艺术，南宋绘画、陶瓷等工艺在此时期有重要发展；可作为城市与视觉文化长期切片，避免把审美成就写成政局因果。 | 城市、知识 | The Met 南宋专题 |
+| 1130—1200 | 朱熹与新儒学 | 大都会博物馆列朱熹生卒为1130—1200并联系其“格物致知”思想；亚洲艺术博物馆概述其新儒学的长期影响。本站可用人物—思想切片，不将思想史压缩为单次政策事件。 | 知识、人物 | The Met / Asian Art Museum |
+| 12世纪起 | 海洋能力与沿海贸易 | 哥伦比亚大学引述资料称，中国的海洋能力从12世纪起持续发展；可作为海贸轨的时期节点，而非对某一港口的精确年表断言。 | 城市水路、技术 | Columbia 对外贸易专题 |
+| 1225 | 赵汝适与《诸蕃志》 | 哥伦比亚大学说明，泉州市舶司官员赵汝适于1225年记录中国商人贸易的对象与货物；适合连接泉州、制度、海贸与知识记录，避免把其写成所有海贸的代表。 | 城市、人物、知识 | Columbia 对外贸易专题 |
+| 1235 | 临安城市社团切片 | 哥伦比亚大学引述1235年文本，列西湖诗社、佛教茶会等团体；可呈现南宋城市社交与文化活动，须注明为一条文本所见的城市精英切片，非全城统计。 | 城市、社会、知识 | Columbia 临安城市专题 |
+| 13世纪中叶 | 泉州与远洋贸易 | 哥伦比亚大学说明，泉州为宋代重要港口，宋代海贸首次超过陆上对外贸易；可使用“宋代时期性”标签，避免伪造单年贸易额。 | 城市水路、经济 | Columbia 对外贸易专题 |
+| 1276 | 临安失守 | 保留现有节点；应衔接南宋政权收缩与人物、沿海移动，不把它写成王朝立即终结。 | 政权、城市、人物 | 既有大运河博物馆/人民日报资料 |
+| 1277 | 南宋海船沉没的考古线索 | 哥伦比亚大学提及1973年发掘的宋代海船于1277年失事，船上有来自东南亚、非洲等地货物痕迹；可作为宋末仍存海贸网络的考古切片，不直接代表全体贸易规模。 | 城市水路、海贸 | Columbia 对外贸易专题 |
+| 1279 | 宋朝终结 | 保留现有节点；亚洲艺术博物馆说明忽必烈在1279年将南方宋地并入元朝版图。站内继续区分王朝终局与制度、城市、知识遗产的后续流动。 | 政权、遗产 | Asian Art Museum |
+
+新增来源：
+
+32. The Metropolitan Museum of Art, Southern Song Dynasty (1127–1279)：https://www.metmuseum.org/essays/southern-song-dynasty-1127-1279
+33. Columbia University, Asia for Educators, International Trade：https://afe.easia.columbia.edu/songdynasty-module/outside-trade.html
+34. Columbia University, Asia for Educators, Hangzhou and the Urban Elite：https://afe.easia.columbia.edu/songdynasty-module/cities-hangzhou.html
+35. Asian Art Museum, China: An Introduction to the Song Dynasty (960–1279)：https://education.asianart.org/resources/an-introduction-to-the-song-dynasty/

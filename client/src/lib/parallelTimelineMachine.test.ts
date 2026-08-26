@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { compareParallelTracks, DEFAULT_PARALLEL_TRACK_IDS, visibleParallelItems } from "./parallelTimeline";
+import { chapterEventIds, compareParallelTracks, DEFAULT_PARALLEL_TRACK_IDS, visibleParallelItems } from "./parallelTimeline";
 import { decodeParallelTimelineUrl, encodeParallelTimelineUrl, initialParallelTimelineState, parallelTimelineReducer, pinAtMostTwo } from "./parallelTimelineMachine";
 
 describe("parallel timeline state machine", () => {
@@ -23,8 +23,15 @@ describe("parallel timeline state machine", () => {
 
   it("filters parallel items to the active chapter and tracks", () => {
     const items = visibleParallelItems("transition", ["politics", "city"]);
-    expect(items.every((item) => ["jingkang", "linan"].includes(item.eventId))).toBe(true);
+    expect(items.every((item) => chapterEventIds("transition").includes(item.eventId))).toBe(true);
     expect(items.every((item) => ["politics", "city"].includes(item.trackId))).toBe(true);
+  });
+
+  it("keeps expanded middle-period nodes inside their readable chapter windows", () => {
+    const items = visibleParallelItems("reform", ["politics", "institution", "knowledge"]);
+    expect(items.some((item) => item.eventId === "qingli-reforms")).toBe(true);
+    expect(items.some((item) => item.eventId === "wujing-zongyao")).toBe(true);
+    expect(items.every((item) => ["qingli-war", "qingli-reforms", "wujing-zongyao", "movable-type", "new-policies", "iron-production"].includes(item.eventId))).toBe(true);
   });
 
   it("drops invalid URL state instead of leaking unknown tracks", () => {

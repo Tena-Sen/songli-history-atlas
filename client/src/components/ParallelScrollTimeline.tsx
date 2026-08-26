@@ -24,7 +24,7 @@ import {
 type Props = { events: ParallelTimelineEvent[] };
 
 const PERSON_NAMES: Record<string, string> = {
-  "zhao-kuangyin": "赵匡胤", "song-zhenzong": "宋真宗", "kou-zhun": "寇准", "bi-sheng": "毕昇", "wang-anshi": "王安石", "song-shenzong": "宋神宗", "song-huizong": "宋徽宗", "song-qinzong": "宋钦宗", "song-gaozong": "宋高宗", "wen-tianxiang": "文天祥", "lu-xiufu": "陆秀夫",
+  "zhao-kuangyin": "赵匡胤", "song-zhenzong": "宋真宗", "kou-zhun": "寇准", "fan-zhongyan": "范仲淹", "bi-sheng": "毕昇", "wang-anshi": "王安石", "song-shenzong": "宋神宗", "song-huizong": "宋徽宗", "song-qinzong": "宋钦宗", "song-gaozong": "宋高宗", "zhu-xi": "朱熹", "zhao-rugua": "赵汝适", "wen-tianxiang": "文天祥", "lu-xiufu": "陆秀夫",
 };
 
 const trackIcons = { politics: BookOpen, city: MapPinned, people: UsersRound, institution: BookOpen, knowledge: BookOpen };

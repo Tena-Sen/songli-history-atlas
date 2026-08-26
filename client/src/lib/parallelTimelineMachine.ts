@@ -78,7 +78,7 @@ export function parallelTimelineReducer(state: ParallelTimelineState, action: Pa
 export function decodeParallelTimelineUrl(search: string): Partial<ParallelTimelineState> {
   const params = new URLSearchParams(search);
   const chapterId = params.get("parallelChapter") as ParallelChapterId | null;
-  const validChapters: ParallelChapterId[] = ["all", "northern", "reform", "transition", "southern"];
+  const validChapters: ParallelChapterId[] = ["all", "northern", "reform", "late-northern", "transition", "southern", "late-song"];
   const validTracks: ParallelTrackId[] = ["politics", "city", "people", "institution", "knowledge"];
   const parsedTracks = (params.get("parallelTracks") ?? "").split(",").filter((track): track is ParallelTrackId => validTracks.includes(track as ParallelTrackId));
   const eventId = params.get("parallelEvent");

@@ -10,6 +10,7 @@ import { FateSlices } from "@/components/FateSlices";
 import { GeographyMap } from "@/components/GeographyMap";
 import { HistoryChain } from "@/components/HistoryChain";
 import { ParallelScrollTimeline } from "@/components/ParallelScrollTimeline";
+import { archiveYear, EXPANDED_SONG_ARCHIVE } from "@/lib/expandedSongArchive";
 import { nextTimelineIndex } from "@/lib/timelineNavigation";
 import {
   ArrowDownRight,
@@ -41,7 +42,7 @@ type TimelineEvent = {
   tone: "celadon" | "seal" | "ink";
 };
 
-const EVENTS: TimelineEvent[] = [
+const CORE_EVENTS: TimelineEvent[] = [
   {
     id: "northern-song",
     year: "960",
@@ -152,6 +153,8 @@ const EVENTS: TimelineEvent[] = [
   },
 ];
 
+const EVENTS: TimelineEvent[] = [...CORE_EVENTS, ...EXPANDED_SONG_ARCHIVE].sort((left, right) => archiveYear(left.year) - archiveYear(right.year));
+
 const FILTERS: Category[] = ["全部", "政权", "外交", "技术", "制度", "城市", "转折"];
 
 const categoryLabels: Record<Exclude<Category, "全部">, string> = {
@@ -210,7 +213,7 @@ export default function Home() {
       const matchQuery =
         !normalized ||
         `${event.year}${event.title}${event.short}${event.tag}`.toLowerCase().includes(normalized.toLowerCase());
-      const firstYear = event.year.includes("11世纪") ? 1040 : Number(event.year.match(/\d{3,4}/)?.[0] ?? 960);
+      const firstYear = archiveYear(event.year);
       return matchFilter && matchQuery && firstYear >= yearRange.start && firstYear <= yearRange.end;
     });
   }, [filter, query, yearRange]);
@@ -328,7 +331,7 @@ export default function Home() {
                   展开历史脊柱
                   <ArrowDownRight size={17} className="transition-transform duration-200 group-hover:translate-y-0.5" />
                 </button>
-                <p className="font-mono text-[11px] tracking-[0.12em] text-[#71817d]">08 节点 / 04 轨道 / 06 来源</p>
+                <p className="font-mono text-[11px] tracking-[0.12em] text-[#71817d]">21 节点 / 05 轨道 / 多源核验</p>
               </div>
             </div>
 
@@ -350,10 +353,10 @@ export default function Home() {
             <div className="grid gap-8 md:grid-cols-[.8fr_1.2fr] md:items-end">
               <div>
                 <p className="eyebrow">读图索引</p>
-                <h2 className="mt-3 max-w-md font-serif text-4xl font-black tracking-[-0.055em] md:text-5xl">两个时代，四条线索。</h2>
+                <h2 className="mt-3 max-w-md font-serif text-4xl font-black tracking-[-0.055em] md:text-5xl">三百余年，多条线索。</h2>
               </div>
               <p className="max-w-[610px] justify-self-end text-base leading-8 text-[#53615d] night:text-[#b4b9b2]">
-                主轴只保留改变叙事走向的年份；边缘的制度、知识、生产与城市轨道，则把宏大的王朝兴亡重新落回可感的历史细节。
+                  王朝转折仍留在主脊柱，中观节点则补入农政、边境、生产、港口、思想和城市日常。每一条线索都连向来源，不以少数大事替代整段历史。
               </p>
             </div>
 
@@ -362,7 +365,7 @@ export default function Home() {
                 ["北宋", "960—1127", "统一、制度与都市增长"],
                 ["南宋", "1127—1279", "南迁、临安与海贸网络"],
                 ["转折", "02", "靖康之变 · 临安失守"],
-                ["微观轨道", "04", "制度 · 技术 · 城市 · 经济"],
+                ["已编节点", "21", "转折 · 制度 · 生产 · 城市 · 海贸"],
               ].map(([label, value, caption]) => (
                 <div key={label} className="px-0 py-6 md:px-6 lg:px-8">
                   <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#4f8c85]">{label}</p>
@@ -523,16 +526,16 @@ export default function Home() {
                   <h2 className="mt-3 max-w-md font-serif text-4xl font-black tracking-[-0.055em] md:text-5xl">王朝之外，历史仍在生长。</h2>
                 </div>
                 <p className="max-w-[660px] justify-self-end text-base leading-8 text-[#53615d] night:text-[#b4b9b2]">
-                  北宋的制度讨论、印刷技术与城市扩张，南宋的临安水路、商市与海贸，构成了另一条不依附于战争与皇帝的历史脉络。
+                  北宋的农政、边境、考试、印刷与铁业，南宋的临安水路、思想、商市和海贸，共同构成不依附于战争与皇帝的一组连续历史问题。
                 </p>
               </div>
 
               <div className="mt-14 grid divide-y divide-[#28302e]/12 border-y border-[#28302e]/12 md:grid-cols-2 md:divide-x md:divide-y-0">
                 {[
-                  [BookOpen, "制度与知识", "科举取士 · 士大夫文化 · 雕版与活字", "知识如何进入制度，并在书页与考试之间被反复复制。"],
-                  [Landmark, "技术与生产", "稻作扩展 · 铁业发展 · 印刷革新", "农业、铁业与印刷共同支撑更复杂的城市与市场生活。"],
-                  [Waves, "城市与贸易", "运河水网 · 临安商市 · 海贸通道", "水路把临安连接到腹地、港口与更广阔的贸易世界。"],
-                  [CircleDot, "北方与南迁", "宋辽关系 · 金宋冲突 · 政治南移", "政权的南迁改变了政治地理，也放大了江南的文化与经济位置。"],
+                  [BookOpen, "制度与知识", "科举取士 · 庆历改革 · 新儒学 · 印刷", "从考试到思想、从改革到书籍，知识如何进入国家与日常。"],
+                  [Landmark, "技术与生产", "占城稻 · 火药书写 · 铁业 · 炭煤", "农业、冶炼和军事技术共同支撑更复杂的市场、军需与城市生活。"],
+                  [Waves, "城市与贸易", "东京街市 · 临安水网 · 泉州港 · 海船考古", "水路把腹地、都城与港口连成可继续追问的贸易世界。"],
+                  [CircleDot, "北方与南迁", "宋辽关系 · 庆历战争 · 金朝建立 · 政治南移", "北方格局的变化与江南承接并置阅读，而不被化约为单一原因。"],
                 ].map(([Icon, title, keywords, description]) => {
                   const TrackIcon = Icon as typeof BookOpen;
                   return (
@@ -611,6 +614,8 @@ export default function Home() {
                     ["史密森尼亚洲艺术国家博物馆", "宋代960—1279年与南北宋分期", "https://asia-archive.si.edu/learn/for-educators/teaching-china-with-the-smithsonian/explore-by-dynasty/song-dynasty/"],
                     ["大都会艺术博物馆", "中国1000—1400年编年资料", "https://www.metmuseum.org/toah/ht/07/eac.html"],
                     ["哥伦比亚大学", "宋代技术、经济、城市与印刷", "https://afe.easia.columbia.edu/songdynasty-module/"],
+                    ["剑桥大学出版社", "澶渊、庆历战争与北宋西北边境研究", "https://www.cambridge.org/core/journals/journal-of-chinese-history/article/fragility-of-peace-song-chinas-northwestern-frontier-and-erosion-of-the-chanyuan-paradigm-in-the-mideleventh-century/AF2F19A32A23ED0F304C3DE814851A3F"],
+                    ["亚洲艺术博物馆", "宋代政治、思想、技术与艺术概述", "https://education.asianart.org/resources/an-introduction-to-the-song-dynasty/"],
                     ["EBSCO Research Starters", "王安石改革的年代与领域", "https://www.ebsco.com/research-starters/history/wang-anshi-introduces-bureaucratic-reforms/"],
                     ["李亚平《说宋朝》", "叙事参考：人物切入与章节节奏（非史料）", "https://www.youtube.com/playlist?list=PLZq60TqYoihpF8MXewu_SveWephV3cDD3"],
                   ].map(([name, note, href], index) => (
