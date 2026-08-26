@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { ArrowUpRight, MapPinned, Route, UserRound } from "lucide-react";
 import { ATLAS_CITIES, ATLAS_PEOPLE, peopleForAtlasCity } from "@/lib/cityPeopleAtlas";
 import { archiveEntriesForCity } from "@/lib/expandedSongArchive";
+import { geoPointsForCity } from "@/lib/spatialExplorer";
 
 const EVENT_NAMES: Record<string, { year: string; title: string }> = {
   "northern-song": { year: "960", title: "建宋" }, chanyuan: { year: "1005", title: "澶渊" }, "movable-type": { year: "11世纪", title: "活字印刷" }, "new-policies": { year: "1069—1072", title: "熙宁新法" }, jingkang: { year: "1127", title: "靖康" }, linan: { year: "1138", title: "临安行在" }, "linan-fall": { year: "1276", title: "临安失守" }, "end-of-song": { year: "1279", title: "崖山之后" },
@@ -22,6 +23,7 @@ export function CityPeopleAtlas() {
   const city = ATLAS_CITIES.find((item) => item.id === cityId) ?? ATLAS_CITIES[0];
   const people = useMemo(() => peopleForAtlasCity(city.id), [city.id]);
   const archiveEntries = useMemo(() => archiveEntriesForCity(city.id), [city.id]);
+  const spatialAnchors = useMemo(() => geoPointsForCity(city.id), [city.id]);
   const person = ATLAS_PEOPLE.find((item) => item.id === personId) ?? people[0];
 
   const selectCity = (nextCityId: string) => {
@@ -49,6 +51,7 @@ export function CityPeopleAtlas() {
             <div className="atlas-selected-city"><p className="font-mono text-[10px] tracking-[.16em] text-[#4f8c85]">{city.period}</p><h3 className="mt-2 font-serif text-4xl font-bold tracking-[-.05em]">{city.name}</h3><p className="mt-1 text-sm text-[#4f8c85]">{city.currentName}</p><p className="mt-5 text-sm leading-7 text-[#71817d]">{city.note}</p></div>
             <div className="atlas-event-threads mt-7"><p className="eyebrow">相关事件</p><div className="mt-3 flex flex-wrap gap-2">{city.eventIds.map((id) => { const event = EVENT_NAMES[id]; return event ? <button key={id} type="button" onClick={() => openTimelineEvent(id)} className="atlas-event-link"><span>{event.year}</span>{event.title}<ArrowUpRight size={12} /></button> : null; })}</div></div>
             {archiveEntries.length > 0 && <div className="atlas-event-threads mt-6"><p className="eyebrow">扩展史料切片</p><div className="mt-3 flex flex-wrap gap-2">{archiveEntries.map((entry) => <button key={entry.id} type="button" onClick={() => openTimelineEvent(entry.id)} className="atlas-event-link"><span>{entry.year}</span>{entry.title}<ArrowUpRight size={12} /></button>)}</div></div>}
+            {spatialAnchors.length > 0 && <div className="atlas-event-threads mt-6"><p className="eyebrow">空间叠层</p><div className="mt-3 flex flex-wrap gap-2">{spatialAnchors.map((anchor) => <button key={anchor.id} type="button" onClick={() => window.dispatchEvent(new CustomEvent("songli:select-place", { detail: anchor.id }))} className="atlas-event-link"><span>{anchor.kind}</span>{anchor.ancientName}<ArrowUpRight size={12} /></button>)}</div></div>}
             <p className="mt-8 border-t border-[#28302e]/12 pt-4 text-[11px] leading-5 text-[#71817d]">资料线索：哥伦比亚大学宋代城市与对外贸易专题。城市、人物与事件的连线仅指向本站的阅读入口，不表达影响强度或穷尽全部历史关联。</p>
           </div>
 

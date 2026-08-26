@@ -215,3 +215,19 @@
 33. Columbia University, Asia for Educators, International Trade：https://afe.easia.columbia.edu/songdynasty-module/outside-trade.html
 34. Columbia University, Asia for Educators, Hangzhou and the Urban Elite：https://afe.easia.columbia.edu/songdynasty-module/cities-hangzhou.html
 35. Asian Art Museum, China: An Introduction to the Song Dynasty (960–1279)：https://education.asianart.org/resources/an-introduction-to-the-song-dynasty/
+
+### 空间地理叠层：州县、运河与港口的资料边界
+
+| 层级 | 站内采用的阅读锚点 | 核验基础 | 展示边界 |
+| --- | --- | --- | --- |
+| 行政层 | 东京开封府、临安府、明州、泉州等州府级标签 | Harvard China Historical GIS 说明其行政数据含省、道、府、县并覆盖221 BCE—1911 CE的时间序列 | 站内只使用少量州府/县名作为读图锚点；不据此绘制宋代行政边界或声称精确辖区。 |
+| 州县切片 | 开封府城、临安府城、明州府城、泉州府城与江淮腹地 | 既有都城/港口资料与 Harvard CHGIS 的行政层级说明 | “州县”表示行政与城市史阅读入口，不等同于完整宋代府县清单。 |
+| 运河与水路 | 大运河终端、江淮水路、浙东水网、东南沿海 | Columbia 临安城市专题说明杭州位于大运河南端且为贸易中心；既有临安城资料 | 线条只指示水路、腹地与港口的阅读关联；不复原河道、水深、里程或精确航线。 |
+| 港口层 | 明州、泉州与东南沿海海路 | Columbia 对外贸易专题说明泉州为宋代重要港口，宋代海贸超过陆上对外贸易，并记录赵汝适、1277海船考古线索 | 不以单个港口代表所有沿海城市；不展示无来源支撑的贸易额或航次。 |
+
+本轮界面采用“地理叠层”而非“精确历史地图”的表述。Harvard CHGIS适合为行政层级与后续数据接入提供规范参照；目前的站内示意图仍以来源清楚的少量阅读锚点为主，避免把视觉位置误读为历史坐标复原。
+
+新增来源：
+
+36. Harvard Center for Geographic Analysis, China Historical GIS：https://gis.harvard.edu/china-historical-gis
+37. Columbia University, Asia for Educators, Cities of the Song / Hangzhou：https://afe.easia.columbia.edu/songdynasty-module/cities-hangzhou.html

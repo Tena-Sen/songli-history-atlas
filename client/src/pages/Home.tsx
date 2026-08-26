@@ -11,6 +11,7 @@ import { GeographyMap } from "@/components/GeographyMap";
 import { HistoryChain } from "@/components/HistoryChain";
 import { ParallelScrollTimeline } from "@/components/ParallelScrollTimeline";
 import { archiveYear, EXPANDED_SONG_ARCHIVE } from "@/lib/expandedSongArchive";
+import { EVENT_FACETS, eventIdsForZoom, eventMatchesFacets, HISTORY_FACETS, TIMELINE_ZOOMS, type HistoryFacet, type TimelineZoomId } from "@/lib/spatialExplorer";
 import { nextTimelineIndex } from "@/lib/timelineNavigation";
 import {
   ArrowDownRight,
@@ -204,19 +205,23 @@ export default function Home() {
   const [night, setNight] = useState(false);
   const [query, setQuery] = useState("");
   const [yearRange, setYearRange] = useState({ start: 960, end: 1279 });
+  const [zoom, setZoom] = useState<TimelineZoomId>("chapter");
+  const [activeFacets, setActiveFacets] = useState<HistoryFacet[]>([]);
   const [timelineAnnouncement, setTimelineAnnouncement] = useState("使用方向键切换历史节点。");
 
   const visibleEvents = useMemo(() => {
     const normalized = query.trim();
     return EVENTS.filter((event) => {
       const matchFilter = filter === "全部" || event.category === filter;
+      const matchFacets = eventMatchesFacets(event.id, activeFacets);
+      const matchZoom = eventIdsForZoom(zoom).includes(event.id);
       const matchQuery =
         !normalized ||
-        `${event.year}${event.title}${event.short}${event.tag}`.toLowerCase().includes(normalized.toLowerCase());
+        `${event.year}${event.title}${event.short}${event.tag}${EVENT_FACETS[event.id]?.join("") ?? ""}`.toLowerCase().includes(normalized.toLowerCase());
       const firstYear = archiveYear(event.year);
-      return matchFilter && matchQuery && firstYear >= yearRange.start && firstYear <= yearRange.end;
+      return matchFilter && matchFacets && matchZoom && matchQuery && firstYear >= yearRange.start && firstYear <= yearRange.end;
     });
-  }, [filter, query, yearRange]);
+  }, [activeFacets, filter, query, yearRange, zoom]);
 
   const scrollToTimeline = () => document.getElementById("time-spine")?.scrollIntoView({ behavior: "smooth" });
 
@@ -229,8 +234,19 @@ export default function Home() {
       if (event.defaultPrevented) return;
       const target = event.target as HTMLElement | null;
       if (target?.matches("input, textarea, select, [contenteditable='true']")) return;
-      if (!(["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"] as string[]).includes(event.key) || visibleEvents.length === 0) return;
+      if (target?.closest("[data-parallel-timeline]")) return;
+      const isDirection = (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"] as string[]).includes(event.key);
+      const isZoomStep = event.key === "PageUp" || event.key === "PageDown";
+      if ((!isDirection && !isZoomStep) || visibleEvents.length === 0) return;
       event.preventDefault();
+      if (isZoomStep) {
+        const currentZoomIndex = TIMELINE_ZOOMS.findIndex((item) => item.id === zoom);
+        const direction = event.key === "PageUp" ? -1 : 1;
+        const nextZoom = TIMELINE_ZOOMS[(currentZoomIndex + direction + TIMELINE_ZOOMS.length) % TIMELINE_ZOOMS.length];
+        setZoom(nextZoom.id);
+        setTimelineAnnouncement(`已切换至${nextZoom.label}缩放：${nextZoom.note}`);
+        return;
+      }
       const currentIndex = Math.max(0, visibleEvents.findIndex((item) => item.id === selected.id));
       const direction = event.key === "ArrowLeft" || event.key === "ArrowUp" ? -1 : 1;
       const nextIndex = nextTimelineIndex(visibleEvents.length, currentIndex, direction);
@@ -245,7 +261,9 @@ export default function Home() {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [visibleEvents, selected.id]);
+  }, [visibleEvents, selected.id, zoom]);
+
+  const toggleFacet = (facet: HistoryFacet) => setActiveFacets((current) => current.includes(facet) ? current.filter((item) => item !== facet) : [...current, facet]);
 
   useEffect(() => {
     const handleChainSelection = (event: Event) => {
@@ -399,6 +417,18 @@ export default function Home() {
                   ))}
                 </div>
 
+                <div className="mt-8 border-y border-[#28302e]/12 py-5">
+                  <div className="flex items-center justify-between gap-3"><p className="font-mono text-[10px] tracking-[0.18em] text-[#4f8c85]">叙事密度</p><span className="text-[10px] text-[#71817d]">Page Up / Down</span></div>
+                  <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="时间轴缩放等级">{TIMELINE_ZOOMS.map((item) => <button key={item.id} type="button" onClick={() => { setZoom(item.id); setTimelineAnnouncement(`已切换至${item.label}缩放：${item.note}`); }} className={`filter-chip ${zoom === item.id ? "filter-chip-active" : ""}`} aria-pressed={zoom === item.id}>{item.label}</button>)}</div>
+                  <p className="mt-3 text-[11px] leading-5 text-[#71817d]">{TIMELINE_ZOOMS.find((item) => item.id === zoom)?.note} · 当前 {visibleEvents.length} 项</p>
+                </div>
+
+                <div className="mt-8 border-y border-[#28302e]/12 py-5">
+                  <div className="flex items-center justify-between gap-3"><p className="font-mono text-[10px] tracking-[0.18em] text-[#4f8c85]">多维标签</p>{activeFacets.length > 0 && <button type="button" onClick={() => setActiveFacets([])} className="text-[10px] text-[#71817d] underline underline-offset-4">清除</button>}</div>
+                  <p className="mt-2 text-[11px] leading-5 text-[#71817d]">多选时仅保留同时包含全部标签的节点。</p>
+                  <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="按历史维度筛选">{HISTORY_FACETS.map((facet) => <button key={facet.id} type="button" onClick={() => toggleFacet(facet.id)} className={`filter-chip ${activeFacets.includes(facet.id) ? "filter-chip-active" : ""}`} aria-pressed={activeFacets.includes(facet.id)}>{facet.label}</button>)}</div>
+                </div>
+
                 <label className="relative mt-8 block">
                   <span className="sr-only">搜索历史节点</span>
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71817d]" size={15} strokeWidth={1.7} />
@@ -409,6 +439,7 @@ export default function Home() {
                     className="h-11 w-full border-b border-[#28302e]/20 bg-transparent pl-9 pr-3 text-sm outline-none transition placeholder:text-[#9ca6a1] focus:border-[#78A9A1] night:border-white/20"
                   />
                 </label>
+                <label className="mt-6 block border-b border-[#28302e]/20 pb-2 text-[11px] text-[#71817d]">快速定位<select value={selected.id} onChange={(event) => { const target = visibleEvents.find((item) => item.id === event.target.value); if (target) { setSelected(target); setTimelineAnnouncement(`已定位至 ${target.year} · ${target.title}`); window.setTimeout(() => document.querySelector<HTMLElement>(`[data-event-id="${target.id}"]`)?.scrollIntoView({ behavior: "smooth", block: "center" }), 0); } }} className="mt-2 w-full bg-transparent text-sm text-[#53615d] outline-none night:text-[#c3c9c1]">{visibleEvents.map((event) => <option key={event.id} value={event.id}>{event.year} · {event.title}</option>)}</select></label>
                 <div className="mt-8 border-y border-[#28302e]/12 py-5">
                   <div className="flex items-center justify-between"><p className="font-mono text-[10px] tracking-[0.18em] text-[#4f8c85]">年份跨度</p><button type="button" onClick={() => setYearRange({ start: 960, end: 1279 })} className="text-[10px] text-[#71817d] underline underline-offset-4">重置</button></div>
                   <p className="mt-3 font-serif text-xl font-bold">{yearRange.start} — {yearRange.end}</p>
