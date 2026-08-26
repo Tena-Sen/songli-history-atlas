@@ -2,10 +2,11 @@
  * 设计提醒｜卷轴地志：偏置纵轴、充足留白、汝窑天青仅用于关键线索，
  * 以宋代文人画的远近层次组织可探索的历史叙事。
  */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ComparisonView } from "@/components/ComparisonView";
 import { ExploreLab } from "@/components/ExploreLab";
 import { GeographyMap } from "@/components/GeographyMap";
+import { nextTimelineIndex } from "@/lib/timelineNavigation";
 import {
   ArrowDownRight,
   ArrowUpRight,
@@ -196,6 +197,7 @@ export default function Home() {
   const [night, setNight] = useState(false);
   const [query, setQuery] = useState("");
   const [yearRange, setYearRange] = useState({ start: 960, end: 1279 });
+  const [timelineAnnouncement, setTimelineAnnouncement] = useState("使用方向键切换历史节点。");
 
   const visibleEvents = useMemo(() => {
     const normalized = query.trim();
@@ -210,6 +212,32 @@ export default function Home() {
   }, [filter, query, yearRange]);
 
   const scrollToTimeline = () => document.getElementById("time-spine")?.scrollIntoView({ behavior: "smooth" });
+
+  useEffect(() => {
+    if (visibleEvents.length > 0 && !visibleEvents.some((event) => event.id === selected.id)) setSelected(visibleEvents[0]);
+  }, [visibleEvents, selected.id]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.matches("input, textarea, select, [contenteditable='true']")) return;
+      if (!(["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"] as string[]).includes(event.key) || visibleEvents.length === 0) return;
+      event.preventDefault();
+      const currentIndex = Math.max(0, visibleEvents.findIndex((item) => item.id === selected.id));
+      const direction = event.key === "ArrowLeft" || event.key === "ArrowUp" ? -1 : 1;
+      const nextIndex = nextTimelineIndex(visibleEvents.length, currentIndex, direction);
+      const next = visibleEvents[nextIndex];
+      setSelected(next);
+      setTimelineAnnouncement(`已切换至 ${next.year} · ${next.title}`);
+      window.requestAnimationFrame(() => {
+        const node = document.querySelector<HTMLElement>(`[data-event-id="${next.id}"]`);
+        node?.focus({ preventScroll: true });
+        node?.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [visibleEvents, selected.id]);
 
   return (
     <div className={night ? "night-mode min-h-screen" : "min-h-screen"}>
@@ -330,6 +358,7 @@ export default function Home() {
                 <p className="eyebrow">历史脊柱</p>
                 <h2 className="mt-3 font-serif text-4xl font-black tracking-[-0.055em]">事件筛选</h2>
                 <p className="mt-4 text-sm leading-7 text-[#71817d]">选择一条线索，时间轴会保留相邻的历史上下文。</p>
+                <p id="timeline-shortcut-hint" className="mt-3 border-l border-[#78a9a1] pl-3 text-[11px] leading-5 text-[#71817d]">快捷键：使用 ← → 或 ↑ ↓ 在当前筛选结果中切换节点。</p>
 
                 <div className="mt-7 flex flex-wrap gap-2 lg:flex-col lg:items-start">
                   {FILTERS.map((item) => (
@@ -381,8 +410,10 @@ export default function Home() {
                             <button
                               type="button"
                               onClick={() => setSelected(event)}
+                              data-event-id={event.id}
                               className={`timeline-entry w-full text-left md:text-inherit ${isSelected ? "timeline-entry-selected" : ""}`}
                               aria-expanded={isSelected}
+                              aria-describedby="timeline-shortcut-hint"
                             >
                               <div className={`flex items-start gap-4 ${isLeft ? "md:flex-row-reverse" : ""}`}>
                                 <div>
@@ -407,6 +438,7 @@ export default function Home() {
                 ) : (
                   <div className="ml-10 border-b border-[#28302e]/15 py-10 text-sm text-[#71817d] md:ml-0 md:text-center">未找到匹配的历史节点。请调整筛选条件或关键词。</div>
                 )}
+                <p className="sr-only" aria-live="polite">{timelineAnnouncement}</p>
 
                 <div className="mt-10 flex items-center gap-3 pl-10 md:justify-center md:pl-0">
                   <span className="grid h-5 w-5 place-items-center border border-[#b86a5a] bg-[#f6f2e8] font-serif text-[8px] font-bold text-[#a66457] night:bg-[#0e161a]">宋</span>

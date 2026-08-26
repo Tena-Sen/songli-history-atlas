@@ -16,6 +16,14 @@ export type ExploreEvent = {
 
 const STORAGE_KEY = "songli-reading-path-v1";
 
+const POSTER_THEMES = {
+  celadon: { label: "天青 · 宣纸", paper: "#f5f0e3", ink: "#26322f", body: "#53615d", accent: "#78a9a1", seal: "#b86a5a", wash: "rgba(118, 161, 153, .30)" },
+  moon: { label: "月白 · 深墨", paper: "#142124", ink: "#ebe5d8", body: "#b8c2ba", accent: "#9fc6bf", seal: "#c98373", wash: "rgba(109, 162, 156, .36)" },
+  silk: { label: "赭石 · 绢本", paper: "#f0e2c7", ink: "#3e3029", body: "#756050", accent: "#9f8066", seal: "#a66457", wash: "rgba(176, 137, 92, .28)" },
+} as const;
+
+type PosterTheme = keyof typeof POSTER_THEMES;
+
 const RELATION_EDGES = [
   ["northern-song", "chanyuan", "边境秩序"],
   ["chanyuan", "new-policies", "国家能力"],
@@ -37,6 +45,9 @@ export function ExploreLab({ events }: { events: ExploreEvent[] }) {
   const [saved, setSaved] = useState<string[]>([]);
   const [activeNode, setActiveNode] = useState<string>("linan");
   const [shared, setShared] = useState(false);
+  const [posterTitle, setPosterTitle] = useState("我的阅读路径");
+  const [posterSubtitle, setPosterSubtitle] = useState("北宋至南宋 · 微观时间轴");
+  const [posterTheme, setPosterTheme] = useState<PosterTheme>("celadon");
 
   useEffect(() => {
     try {
@@ -81,7 +92,8 @@ export function ExploreLab({ events }: { events: ExploreEvent[] }) {
     canvas.height = 1350;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    ctx.fillStyle = "#f5f0e3";
+    const theme = POSTER_THEMES[posterTheme];
+    ctx.fillStyle = theme.paper;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < 150; i += 1) {
       const x = (i * 83) % canvas.width; const y = (i * 149) % canvas.height;
@@ -89,32 +101,32 @@ export function ExploreLab({ events }: { events: ExploreEvent[] }) {
       ctx.fillRect(x, y, 1.2, 1.2);
     }
     const wash = ctx.createRadialGradient(845, 255, 30, 825, 280, 470);
-    wash.addColorStop(0, "rgba(118, 161, 153, .30)"); wash.addColorStop(1, "rgba(118, 161, 153, 0)");
+    wash.addColorStop(0, theme.wash); wash.addColorStop(1, "rgba(118, 161, 153, 0)");
     ctx.fillStyle = wash; ctx.fillRect(0, 0, canvas.width, canvas.height);
     const inkMountain = (baseY: number, opacity: number, shift: number) => {
       ctx.beginPath(); ctx.moveTo(0, baseY); ctx.lineTo(0, baseY - 70);
       for (let x = 0; x <= canvas.width; x += 120) { const peak = baseY - 80 - ((x / 120 + shift) % 3) * 55; ctx.quadraticCurveTo(x + 48, peak, x + 120, baseY - 55 + ((x / 120 + shift) % 2) * 30); }
-      ctx.lineTo(canvas.width, baseY); ctx.closePath(); ctx.fillStyle = `rgba(47, 70, 68, ${opacity})`; ctx.fill();
+      ctx.lineTo(canvas.width, baseY); ctx.closePath(); ctx.fillStyle = posterTheme === "moon" ? `rgba(218, 231, 220, ${opacity})` : `rgba(47, 70, 68, ${opacity})`; ctx.fill();
     };
     inkMountain(1170, 0.11, 0); inkMountain(1230, 0.07, 1);
-    ctx.strokeStyle = "rgba(40,48,46,.18)"; ctx.lineWidth = 2; ctx.strokeRect(48, 48, canvas.width - 96, canvas.height - 96);
-    ctx.strokeStyle = "#78a9a1"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(96, 154); ctx.lineTo(334, 154); ctx.stroke();
-    ctx.fillStyle = "#4f8c85"; ctx.font = "500 25px 'IBM Plex Mono', monospace"; ctx.fillText("SONGLI / READING PATH", 96, 122);
-    ctx.save(); ctx.scale(0.82, 1.16); ctx.fillStyle = "#26322f"; ctx.font = "500 88px 'Noto Serif SC', serif"; ctx.fillText("我的阅读路径", 118, 250); ctx.restore();
-    ctx.font = "400 28px 'Noto Sans SC', sans-serif"; ctx.fillStyle = "#53615d"; ctx.fillText("北宋至南宋 · 微观时间轴", 96, 332);
-    ctx.strokeStyle = "#78a9a1"; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(170, 435); ctx.lineTo(170, 1095); ctx.stroke();
+    ctx.strokeStyle = posterTheme === "moon" ? "rgba(235,229,216,.26)" : "rgba(40,48,46,.18)"; ctx.lineWidth = 2; ctx.strokeRect(48, 48, canvas.width - 96, canvas.height - 96);
+    ctx.strokeStyle = theme.accent; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(96, 154); ctx.lineTo(334, 154); ctx.stroke();
+    ctx.fillStyle = theme.accent; ctx.font = "500 25px 'IBM Plex Mono', monospace"; ctx.fillText("SONGLI / READING PATH", 96, 122);
+    ctx.save(); ctx.scale(0.82, 1.16); ctx.fillStyle = theme.ink; ctx.font = "500 88px 'Noto Serif SC', serif"; ctx.fillText(posterTitle.slice(0, 12) || "我的阅读路径", 118, 250); ctx.restore();
+    ctx.font = "400 28px 'Noto Sans SC', sans-serif"; ctx.fillStyle = theme.body; ctx.fillText(posterSubtitle.slice(0, 28) || "北宋至南宋 · 微观时间轴", 96, 332);
+    ctx.strokeStyle = theme.accent; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(170, 435); ctx.lineTo(170, 1095); ctx.stroke();
     savedEvents.slice(0, 7).forEach((event, index) => {
       const y = 486 + index * 88;
-      ctx.fillStyle = event.tone === "seal" ? "#b86a5a" : "#78a9a1"; ctx.beginPath(); ctx.arc(170, y - 8, 10, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = "#4f8c85"; ctx.font = "500 20px 'IBM Plex Mono', monospace"; ctx.fillText(event.year, 222, y - 15);
-      ctx.save(); ctx.scale(0.9, 1.06); ctx.fillStyle = "#28302e"; ctx.font = "500 39px 'Noto Serif SC', serif"; ctx.fillText(event.title, 246, y + 28); ctx.restore();
+      ctx.fillStyle = event.tone === "seal" ? theme.seal : theme.accent; ctx.beginPath(); ctx.arc(170, y - 8, 10, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = theme.accent; ctx.font = "500 20px 'IBM Plex Mono', monospace"; ctx.fillText(event.year, 222, y - 15);
+      ctx.save(); ctx.scale(0.9, 1.06); ctx.fillStyle = theme.ink; ctx.font = "500 39px 'Noto Serif SC', serif"; ctx.fillText(event.title, 246, y + 28); ctx.restore();
     });
     if (savedEvents.length === 0) {
-      ctx.fillStyle = "#71817d"; ctx.font = "400 32px 'Noto Sans SC', sans-serif"; ctx.fillText("尚未收藏节点。回到时间轴，从一页开始。", 220, 510);
+      ctx.fillStyle = theme.body; ctx.font = "400 32px 'Noto Sans SC', sans-serif"; ctx.fillText("尚未收藏节点。回到时间轴，从一页开始。", 220, 510);
     }
-    ctx.save(); ctx.translate(910, 985); ctx.rotate(-0.1); ctx.strokeStyle = "#b86a5a"; ctx.lineWidth = 3; ctx.strokeRect(-38, -38, 76, 76); ctx.font = "500 22px 'Noto Serif SC', serif"; ctx.fillStyle = "#a66457"; ctx.fillText("阅记", -22, 8); ctx.restore();
-    ctx.fillStyle = "#53615d"; ctx.font = "400 22px 'Noto Sans SC', sans-serif"; ctx.fillText("宋历 · 以一条天青线重读两宋", 96, 1212);
-    ctx.fillStyle = "#78a9a1"; ctx.fillRect(96, 1242, 210, 2);
+    ctx.save(); ctx.translate(910, 985); ctx.rotate(-0.1); ctx.strokeStyle = theme.seal; ctx.lineWidth = 3; ctx.strokeRect(-38, -38, 76, 76); ctx.font = "500 22px 'Noto Serif SC', serif"; ctx.fillStyle = theme.seal; ctx.fillText("阅记", -22, 8); ctx.restore();
+    ctx.fillStyle = theme.body; ctx.font = "400 22px 'Noto Sans SC', sans-serif"; ctx.fillText("宋历 · 以一条天青线重读两宋", 96, 1212);
+    ctx.fillStyle = theme.accent; ctx.fillRect(96, 1242, 210, 2);
     const anchor = document.createElement("a");
     anchor.download = "songli-my-reading-path.png";
     anchor.href = canvas.toDataURL("image/png");
@@ -136,6 +148,12 @@ export function ExploreLab({ events }: { events: ExploreEvent[] }) {
             <div className="flex items-center justify-between"><div className="flex items-center gap-3"><Bookmark size={19} className="text-[#4f8c85]" strokeWidth={1.4} /><p className="eyebrow">我的阅读路径</p></div><span className="font-mono text-[10px] tracking-[0.14em] text-[#71817d]">{savedEvents.length.toString().padStart(2, "0")} SAVED</span></div>
             <div className="mt-7 divide-y divide-[#28302e]/12 border-y border-[#28302e]/12">
               {savedEvents.length ? savedEvents.map((event, index) => <div key={event.id} className="flex items-center justify-between gap-4 py-4"><div><p className="font-mono text-[10px] tracking-[0.16em] text-[#4f8c85]">{event.year}</p><p className="mt-1 font-serif text-xl font-bold">{event.title}</p></div><div className="flex items-center gap-1"><button type="button" disabled={index === 0} onClick={() => move(event.id, -1)} className="path-order-button" aria-label={`上移${event.title}`}><ChevronUp size={14} /></button><button type="button" disabled={index === savedEvents.length - 1} onClick={() => move(event.id, 1)} className="path-order-button" aria-label={`下移${event.title}`}><ChevronDown size={14} /></button><button type="button" onClick={() => toggle(event.id)} className="grid h-8 w-8 place-items-center text-[#71817d] transition hover:text-[#a66457]" aria-label={`移除${event.title}`}><X size={16} /></button></div></div>) : <p className="py-7 text-sm leading-7 text-[#71817d]">尚未收藏节点。在右侧索引中点选书签，即可形成个人的阅读线索。</p>}
+            </div>
+            <div className="mt-7 border-y border-[#28302e]/12 py-5">
+              <p className="eyebrow">海报题签</p>
+              <label className="poster-field mt-4"><span>标题</span><input value={posterTitle} maxLength={12} onChange={(event) => setPosterTitle(event.target.value)} aria-label="海报标题" /></label>
+              <label className="poster-field mt-3"><span>副标题</span><input value={posterSubtitle} maxLength={28} onChange={(event) => setPosterSubtitle(event.target.value)} aria-label="海报副标题" /></label>
+              <div className="mt-4"><span className="poster-field-label">宋韵配色</span><div className="mt-3 flex flex-wrap gap-2">{(Object.keys(POSTER_THEMES) as PosterTheme[]).map((key) => <button key={key} type="button" onClick={() => setPosterTheme(key)} className={`poster-theme ${posterTheme === key ? "poster-theme-active" : ""}`} aria-pressed={posterTheme === key}><i style={{ background: POSTER_THEMES[key].accent }} /><span>{POSTER_THEMES[key].label}</span></button>)}</div></div>
             </div>
             <button type="button" onClick={makePoster} className="mt-7 inline-flex items-center gap-2 bg-[#28302e] px-4 py-3 text-sm text-[#f6f2e8] transition hover:bg-[#4f8c85] night:bg-[#78a9a1] night:text-[#0e161a]"><Share2 size={16} /> 生成分享海报 <Download size={14} /></button>
             {shared && <p className="mt-3 inline-flex items-center gap-2 text-xs text-[#4f8c85]"><Check size={14} /> 海报已下载，可直接分享。</p>}

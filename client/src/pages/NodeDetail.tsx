@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowUpRight, BookOpenText, Landmark, Quote, ScrollText } fr
 import { useEffect, useMemo, useState } from "react";
 import { Link, useRoute } from "wouter";
 import { trpc } from "@/lib/trpc";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 type Detail = {
   id: string;
@@ -37,6 +38,8 @@ type HistoricalPerson = {
   id: string;
   name: string;
   role: string;
+  era: string;
+  bio: string;
   note: string;
   nodeIds: string[];
   sourceName: string;
@@ -44,17 +47,17 @@ type HistoricalPerson = {
 };
 
 const PEOPLE: Record<string, HistoricalPerson> = {
-  "zhao-kuangyin": { id: "zhao-kuangyin", name: "赵匡胤", role: "北宋开国君主", note: "作为960年建宋节点的核心人物，提示新的中央政权由此开启。", nodeIds: ["northern-song"], sourceName: "《宋史·太祖本纪》开放文本", sourceUrl: "https://zh.wikisource.org/wiki/宋史/卷001" },
-  "song-zhenzong": { id: "song-zhenzong", name: "宋真宗", role: "北宋皇帝", note: "与澶渊之盟所代表的北方关系处理直接相关。", nodeIds: ["chanyuan"], sourceName: "澶渊盟约研究入口", sourceUrl: "https://www.cambridge.org/core/journals/journal-of-chinese-history/article/fragility-of-peace-song-chinas-northwestern-frontier-and-erosion-of-the-chanyuan-paradigm-in-the-mideleventh-century/AF2F19A32A23ED0F304C3DE814851A3F" },
-  "kou-zhun": { id: "kou-zhun", name: "寇准", role: "北宋宰相", note: "站内以其作为澶渊之盟叙事的相关人物标签，不展开完整生平判断。", nodeIds: ["chanyuan"], sourceName: "澶渊盟约研究入口", sourceUrl: "https://www.cambridge.org/core/journals/journal-of-chinese-history/article/fragility-of-peace-song-chinas-northwestern-frontier-and-erosion-of-the-chanyuan-paradigm-in-the-mideleventh-century/AF2F19A32A23ED0F304C3DE814851A3F" },
-  "bi-sheng": { id: "bi-sheng", name: "毕昇", role: "活字制作相关人物", note: "《梦溪笔谈》以“庆历中，有布衣毕昇，又为活板”记录其与活字印刷的关联。", nodeIds: ["movable-type"], sourceName: "中国哲学书电子化计划《梦溪笔谈》", sourceUrl: "https://ctext.org/wiki.pl?if=gb&res=13396" },
-  "shen-kuo": { id: "shen-kuo", name: "沈括", role: "《梦溪笔谈》作者", note: "站内通过其笔记文字，为毕昇与活字印刷节点保留可追溯的史料入口。", nodeIds: ["movable-type"], sourceName: "中国哲学书电子化计划《梦溪笔谈》", sourceUrl: "https://ctext.org/wiki.pl?if=gb&res=13396" },
-  "wang-anshi": { id: "wang-anshi", name: "王安石", role: "北宋改革者", note: "与熙宁新法的财政、选官与军政调整相关。", nodeIds: ["new-policies"], sourceName: "EBSCO 王安石改革专题", sourceUrl: "https://www.ebsco.com/research-starters/history/wang-anshi-introduces-bureaucratic-reforms/" },
-  "song-shenzong": { id: "song-shenzong", name: "宋神宗", role: "北宋皇帝", note: "新法推行所处政治环境的重要人物标签。", nodeIds: ["new-policies"], sourceName: "EBSCO 王安石改革专题", sourceUrl: "https://www.ebsco.com/research-starters/history/wang-anshi-introduces-bureaucratic-reforms/" },
-  "song-gaozong": { id: "song-gaozong", name: "宋高宗", role: "南宋开创者", note: "从1127年南渡到1138年临安为行在，串联两宋分界与江南都城形成。", nodeIds: ["jingkang", "linan"], sourceName: "《宋史·高宗纪》与宋代分期资料", sourceUrl: "https://zh.wikisource.org/wiki/宋史/卷030" },
-  "lu-xiufu": { id: "lu-xiufu", name: "陆秀夫", role: "南宋末年大臣", note: "《宋史》记其在南宋末局追从二王，并与张世杰等共同参与海上政局。", nodeIds: ["linan-fall", "end-of-song"], sourceName: "《宋史·卷451》", sourceUrl: "https://zh.wikisource.org/wiki/宋史/卷451" },
-  "wen-tianxiang": { id: "wen-tianxiang", name: "文天祥", role: "南宋末年政治人物", note: "站内将其作为临安失守后与南宋末局相关的阅读标签。", nodeIds: ["linan-fall", "end-of-song"], sourceName: "维基文库《文天祥传》", sourceUrl: "https://zh.wikisource.org/wiki/文天祥傳" },
-  "zhang-shijie": { id: "zhang-shijie", name: "张世杰", role: "南宋末年将领", note: "与陆秀夫共同关联南宋政权收缩与崖山终局的站内叙事。", nodeIds: ["linan-fall", "end-of-song"], sourceName: "《宋史·卷451》", sourceUrl: "https://zh.wikisource.org/wiki/宋史/卷451" },
+  "zhao-kuangyin": { id: "zhao-kuangyin", name: "赵匡胤", role: "北宋开国君主", era: "10世纪 · 北宋开端", bio: "后周将领出身，960年建立宋朝。本站以其为北宋政权开端的人物索引，连接统一与中央政权的起点。", note: "作为960年建宋节点的核心人物，提示新的中央政权由此开启。", nodeIds: ["northern-song"], sourceName: "《宋史·太祖本纪》开放文本", sourceUrl: "https://zh.wikisource.org/wiki/宋史/卷001" },
+  "song-zhenzong": { id: "song-zhenzong", name: "宋真宗", role: "北宋皇帝", era: "11世纪初 · 北方关系", bio: "北宋皇帝。本站将其置入澶渊之盟的阅读索引，用以提示朝廷决策与北方关系的交会。", note: "与澶渊之盟所代表的北方关系处理直接相关。", nodeIds: ["chanyuan"], sourceName: "澶渊盟约研究入口", sourceUrl: "https://www.cambridge.org/core/journals/journal-of-chinese-history/article/fragility-of-peace-song-chinas-northwestern-frontier-and-erosion-of-the-chanyuan-paradigm-in-the-mideleventh-century/AF2F19A32A23ED0F304C3DE814851A3F" },
+  "kou-zhun": { id: "kou-zhun", name: "寇准", role: "北宋宰相", era: "11世纪初 · 边境外交", bio: "北宋重臣。其名常与澶渊之盟的政治决策相连；本站仅以该事件作为关联入口，不将短篇小传替代完整人物研究。", note: "站内以其作为澶渊之盟叙事的相关人物标签，不展开完整生平判断。", nodeIds: ["chanyuan"], sourceName: "澶渊盟约研究入口", sourceUrl: "https://www.cambridge.org/core/journals/journal-of-chinese-history/article/fragility-of-peace-song-chinas-northwestern-frontier-and-erosion-of-the-chanyuan-paradigm-in-the-mideleventh-century/AF2F19A32A23ED0F304C3DE814851A3F" },
+  "bi-sheng": { id: "bi-sheng", name: "毕昇", role: "活字制作相关人物", era: "11世纪 · 技术传播", bio: "《梦溪笔谈》所记的布衣人物，因“又为活板”而与活字印刷的历史叙事相连。", note: "《梦溪笔谈》以“庆历中，有布衣毕昇，又为活板”记录其与活字印刷的关联。", nodeIds: ["movable-type"], sourceName: "中国哲学书电子化计划《梦溪笔谈》", sourceUrl: "https://ctext.org/wiki.pl?if=gb&res=13396" },
+  "shen-kuo": { id: "shen-kuo", name: "沈括", role: "《梦溪笔谈》作者", era: "11世纪 · 笔记与知识", bio: "北宋知识人，其《梦溪笔谈》保留了毕昇与活字印刷的重要文字记录。本站以此强调技术史同样依赖文本保存。", note: "站内通过其笔记文字，为毕昇与活字印刷节点保留可追溯的史料入口。", nodeIds: ["movable-type"], sourceName: "中国哲学书电子化计划《梦溪笔谈》", sourceUrl: "https://ctext.org/wiki.pl?if=gb&res=13396" },
+  "wang-anshi": { id: "wang-anshi", name: "王安石", role: "北宋改革者", era: "11世纪后期 · 制度改革", bio: "北宋政治人物。本站通过熙宁新法这一节点，提示财政、选官与军政调整如何成为一组相互关联的改革问题。", note: "与熙宁新法的财政、选官与军政调整相关。", nodeIds: ["new-policies"], sourceName: "EBSCO 王安石改革专题", sourceUrl: "https://www.ebsco.com/research-starters/history/wang-anshi-introduces-bureaucratic-reforms/" },
+  "song-shenzong": { id: "song-shenzong", name: "宋神宗", role: "北宋皇帝", era: "11世纪后期 · 改革政治", bio: "北宋皇帝。本站以其作为新法所处政治环境的人物标签，帮助读者从改革者之外看到制度推行的朝廷背景。", note: "新法推行所处政治环境的重要人物标签。", nodeIds: ["new-policies"], sourceName: "EBSCO 王安石改革专题", sourceUrl: "https://www.ebsco.com/research-starters/history/wang-anshi-introduces-bureaucratic-reforms/" },
+  "song-gaozong": { id: "song-gaozong", name: "宋高宗", role: "南宋开创者", era: "12世纪 · 南渡与临安", bio: "南宋开创者。其经历将1127年的政权南移与1138年临安为行在所连接起来，是理解两宋分界与江南都城形成的关键线索。", note: "从1127年南渡到1138年临安为行在，串联两宋分界与江南都城形成。", nodeIds: ["jingkang", "linan"], sourceName: "《宋史·高宗纪》与宋代分期资料", sourceUrl: "https://zh.wikisource.org/wiki/宋史/卷030" },
+  "lu-xiufu": { id: "lu-xiufu", name: "陆秀夫", role: "南宋末年大臣", era: "13世纪 · 海上政局", bio: "南宋末年大臣。《宋史》记其追从二王，并与张世杰共同参与南宋末局中的政务与军旅安排。", note: "《宋史》记其在南宋末局追从二王，并与张世杰等共同参与海上政局。", nodeIds: ["linan-fall", "end-of-song"], sourceName: "《宋史·卷451》", sourceUrl: "https://zh.wikisource.org/wiki/宋史/卷451" },
+  "wen-tianxiang": { id: "wen-tianxiang", name: "文天祥", role: "南宋末年政治人物", era: "13世纪 · 宋末政治", bio: "南宋末年政治人物。《文天祥传》记其在德祐初响应勤王，并经历临安失守前后的南宋末局。", note: "站内将其作为临安失守后与南宋末局相关的阅读标签。", nodeIds: ["linan-fall", "end-of-song"], sourceName: "维基文库《文天祥传》", sourceUrl: "https://zh.wikisource.org/wiki/文天祥傳" },
+  "zhang-shijie": { id: "zhang-shijie", name: "张世杰", role: "南宋末年将领", era: "13世纪 · 宋末军旅", bio: "南宋末年将领。本站以其与陆秀夫的关联，阅读临安失守之后南宋政权收缩与崖山终局。", note: "与陆秀夫共同关联南宋政权收缩与崖山终局的站内叙事。", nodeIds: ["linan-fall", "end-of-song"], sourceName: "《宋史·卷451》", sourceUrl: "https://zh.wikisource.org/wiki/宋史/卷451" },
 };
 
 const PEOPLE_BY_NODE: Record<string, string[]> = {
@@ -68,6 +71,7 @@ export default function NodeDetail() {
   const analysis = trpc.textStudy.analyze.useMutation();
   const people = useMemo(() => detail ? (PEOPLE_BY_NODE[detail.id] ?? []).map((id) => PEOPLE[id]).filter(Boolean) : [], [detail]);
   const [activePersonId, setActivePersonId] = useState<string | null>(null);
+  const [bioOpen, setBioOpen] = useState(false);
   useEffect(() => { setActivePersonId(people[0]?.id ?? null); }, [detail?.id, people]);
   const activePerson = activePersonId ? PEOPLE[activePersonId] : null;
   const relatedNodes = activePerson ? activePerson.nodeIds.map((id) => DETAILS.find((item) => item.id === id)).filter(Boolean) : [];
@@ -97,7 +101,7 @@ export default function NodeDetail() {
             <h1 className="mt-2 font-serif text-5xl font-black tracking-[-0.06em] md:text-6xl">{detail.title}</h1>
             {isRupture && <span className="detail-rupture-seal">王朝转折</span>}
             <p className="mt-6 max-w-sm text-base leading-8 text-[#53615d] night:text-[#b4b9b2]">{detail.summary}</p>
-            {people.length > 0 && <div className="mt-8 border-y border-[#28302e]/12 py-5"><p className="eyebrow">相关人物</p><div className="mt-4 flex flex-wrap gap-2">{people.map((person) => <button key={person.id} type="button" onClick={() => setActivePersonId(person.id)} className={`person-tag ${activePersonId === person.id ? "person-tag-active" : ""}`}>{person.name}<span>{person.role}</span></button>)}</div></div>}
+            {people.length > 0 && <div className="mt-8 border-y border-[#28302e]/12 py-5"><p className="eyebrow">相关人物</p><div className="mt-4 flex flex-wrap gap-2">{people.map((person) => <button key={person.id} type="button" onClick={() => { setActivePersonId(person.id); setBioOpen(true); }} className={`person-tag ${activePersonId === person.id ? "person-tag-active" : ""}`}>{person.name}<span>{person.role}</span></button>)}</div><p className="mt-4 text-[11px] leading-5 text-[#71817d]">点选人物，打开小传与本站相关事件。</p></div>}
             <div className="mt-10 border-y border-[#28302e]/12 py-5 text-xs leading-6 text-[#71817d]">本页将古籍短摘、现代释义与资料来源并置；引文用于导读，具体异体字、断句与版本差异请以原典校勘本为准。</div>
           </aside>
 
@@ -145,6 +149,17 @@ export default function NodeDetail() {
           </div>
         </div>
       </article>
+      <Dialog open={bioOpen} onOpenChange={setBioOpen}>
+        <DialogContent className="bio-dialog max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-none border-[#28302e]/20 bg-[#f6f2e8] p-0 text-[#28302e] night:border-white/15 night:bg-[#0e161a] night:text-[#e8e2d3]">
+          {activePerson && <div className="p-7 sm:p-9">
+            <DialogHeader className="text-left"><p className="eyebrow">人物小传 · 站内索引</p><DialogTitle className="mt-4 font-serif text-4xl font-black tracking-[-0.06em]">{activePerson.name}</DialogTitle><DialogDescription className="mt-2 font-mono text-[11px] tracking-[0.14em] text-[#4f8c85]">{activePerson.era} · {activePerson.role}</DialogDescription></DialogHeader>
+            <div className="mt-7 border-y border-[#28302e]/12 py-6"><p className="text-[16px] leading-8 text-[#53615d] night:text-[#b4b9b2]">{activePerson.bio}</p></div>
+            <div className="mt-7"><p className="eyebrow">本站相关事件</p><div className="mt-4 divide-y divide-[#28302e]/12 border-y border-[#28302e]/12">{relatedNodes.map((node) => node && <Link key={node.id} href={`/event/${node.id}`} onClick={() => setBioOpen(false)} className="group flex items-center justify-between gap-5 py-4"><div><p className="font-mono text-[10px] tracking-[0.15em] text-[#4f8c85]">{node.year}</p><p className="mt-1 font-serif text-xl font-bold">{node.title}</p></div><ArrowUpRight size={16} className="text-[#78a9a1] transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" /></Link>)}</div></div>
+            <a href={activePerson.sourceUrl} target="_blank" rel="noreferrer" className="mt-7 inline-flex items-center gap-2 border-b border-[#78a9a1] pb-1 text-xs text-[#397b74] hover:gap-3">查看人物小传来源：{activePerson.sourceName}<ArrowUpRight size={13} /></a>
+            <p className="mt-5 text-xs leading-6 text-[#71817d]">本站人物小传仅为相关节点的阅读导引；事件与生平的完整论述请以原典和专业研究为准。</p>
+          </div>}
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }
