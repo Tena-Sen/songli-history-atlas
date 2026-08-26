@@ -3,8 +3,8 @@
  * 用留白、细线与天青节点组织探索，而非通用仪表板卡片。
  */
 import { useEffect, useMemo, useState } from "react";
-import { Bookmark, BookmarkPlus, Check, ChevronDown, ChevronUp, Download, Network, Share2, Trash2, X } from "lucide-react";
-import { addPosterPreset, DEFAULT_POSTER_PRESETS, makePosterPreset, parsePosterPresets, posterFieldsFromPreset, POSTER_PRESET_STORAGE_KEY, removePosterPreset, type PosterPreset, type PosterThemeName } from "@/lib/posterPresets";
+import { Bookmark, BookmarkPlus, Check, ChevronDown, ChevronUp, Download, Network, Share2, Shuffle, Trash2, X } from "lucide-react";
+import { addPosterPreset, DEFAULT_POSTER_PRESETS, makePosterPreset, parsePosterPresets, pickRandomPosterPreset, posterFieldsFromPreset, POSTER_PRESET_STORAGE_KEY, removePosterPreset, type PosterPreset, type PosterThemeName } from "@/lib/posterPresets";
 
 export type ExploreEvent = {
   id: string;
@@ -100,6 +100,19 @@ export function ExploreLab({ events }: { events: ExploreEvent[] }) {
     setPresetNotice(`已移除「${name}」`);
   };
 
+  const randomizePreset = () => {
+    const randomPreset = pickRandomPosterPreset([...DEFAULT_POSTER_PRESETS, ...presets]);
+    if (!randomPreset) {
+      setPresetNotice("暂无可用的宋韵方案");
+      return;
+    }
+    const fields = posterFieldsFromPreset(randomPreset);
+    setPosterTitle(fields.title);
+    setPosterSubtitle(fields.subtitle);
+    setPosterTheme(fields.theme);
+    setPresetNotice(`随机展开「${randomPreset.name}」`);
+  };
+
   const move = (id: string, direction: -1 | 1) => {
     const index = saved.indexOf(id);
     const target = index + direction;
@@ -190,6 +203,7 @@ export function ExploreLab({ events }: { events: ExploreEvent[] }) {
             </div>
             <div className="poster-preset-panel mt-6">
               <div className="flex items-center justify-between gap-4"><p className="eyebrow">我的宋韵预设</p><span className="font-mono text-[10px] tracking-[0.14em] text-[#71817d]">{presets.length.toString().padStart(2, "0")} / 08</span></div>
+              <div className="mt-4 flex items-center justify-between gap-4 border-y border-[#28302e]/10 py-3"><p className="text-xs leading-6 text-[#71817d]">从内置与收藏方案中随机抽取一页。</p><button type="button" onClick={randomizePreset} className="random-preset-button" aria-label="随机应用一套宋韵海报方案"><Shuffle size={14} /> 随机宋韵</button></div>
               <div className="mt-4"><span className="poster-field-label">内置方案</span><div className="mt-3 flex flex-wrap gap-2">{DEFAULT_POSTER_PRESETS.map((preset) => <button key={preset.id} type="button" onClick={() => applyPreset(preset)} className="default-preset" aria-label={`应用默认方案${preset.name}`}><i style={{ background: POSTER_THEMES[preset.theme].accent }} />{preset.name}</button>)}</div></div>
               <div className="mt-4 flex gap-2"><input value={presetName} maxLength={18} onChange={(event) => setPresetName(event.target.value)} aria-label="预设名称" placeholder="为此方案命名" className="preset-name-input" /><button type="button" onClick={saveCurrentPreset} className="preset-save-button"><BookmarkPlus size={14} /> 保存</button></div>
               {presets.length ? <div className="mt-4 divide-y divide-[#28302e]/10 border-y border-[#28302e]/10">{presets.map((preset) => <div key={preset.id} className="flex items-center gap-2 py-3"><button type="button" onClick={() => applyPreset(preset)} className="preset-apply min-w-0 flex-1 text-left"><i style={{ background: POSTER_THEMES[preset.theme].accent }} /><span className="min-w-0"><strong>{preset.name}</strong><em>{POSTER_THEMES[preset.theme].label} · {preset.title}</em></span></button><button type="button" onClick={() => removePreset(preset.id, preset.name)} className="preset-delete" aria-label={`删除预设${preset.name}`}><Trash2 size={14} /></button></div>)}</div> : <p className="mt-4 text-xs leading-6 text-[#71817d]">保存常用的题签与配色，下一次可一键应用。</p>}

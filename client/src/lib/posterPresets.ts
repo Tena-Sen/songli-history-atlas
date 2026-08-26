@@ -45,6 +45,11 @@ export function posterFieldsFromPreset(preset: PosterPreset) {
   return { title: preset.title, subtitle: preset.subtitle, theme: preset.theme };
 }
 
+export function pickRandomPosterPreset(presets: PosterPreset[], random: () => number = Math.random): PosterPreset | undefined {
+  if (!presets.length) return undefined;
+  return presets[Math.min(presets.length - 1, Math.floor(random() * presets.length))];
+}
+
 export function parsePosterPresets(raw: string | null): PosterPreset[] {
   if (!raw) return [];
   try {

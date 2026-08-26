@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addPosterPreset, DEFAULT_POSTER_PRESETS, makePosterPreset, parsePosterPresets, posterFieldsFromPreset, removePosterPreset } from "./posterPresets";
+import { addPosterPreset, DEFAULT_POSTER_PRESETS, makePosterPreset, parsePosterPresets, pickRandomPosterPreset, posterFieldsFromPreset, removePosterPreset } from "./posterPresets";
 
 describe("poster presets", () => {
   it("normalizes an untitled preset into a safe Songli reading-path preset", () => {
@@ -23,5 +23,10 @@ describe("poster presets", () => {
     expect(posterFieldsFromPreset(withSaved[0]!)).toEqual({ title: "夜读宋历", subtitle: "沿一线天青", theme: "moon" });
     expect(removePosterPreset(withSaved, "moon")).toEqual([]);
     expect(DEFAULT_POSTER_PRESETS.map((preset) => preset.theme)).toEqual(["celadon", "moon", "silk"]);
+  });
+
+  it("selects a deterministic random preset safely and handles an empty pool", () => {
+    expect(pickRandomPosterPreset(DEFAULT_POSTER_PRESETS, () => 0.9)?.id).toBe("default-silk");
+    expect(pickRandomPosterPreset([], () => 0.5)).toBeUndefined();
   });
 });
