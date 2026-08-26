@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getHistoryChain, HISTORY_CHAINS, nextHistoryChainIndex } from "./historyChains";
+import { getHistoryChain, HISTORY_CHAINS, nextHistoryChainIndex, readingBranchesForChain } from "./historyChains";
 
 describe("history chains", () => {
   it("provides three ordered stages for every time-axis node", () => {
@@ -16,5 +16,10 @@ describe("history chains", () => {
     expect(nextHistoryChainIndex(8, 0, -1)).toBe(7);
     expect(nextHistoryChainIndex(8, 7, 1)).toBe(0);
     expect(nextHistoryChainIndex(0, 0, 1)).toBe(-1);
+  });
+
+  it("offers an alternate readable branch for every chain", () => {
+    expect(HISTORY_CHAINS.every((chain) => readingBranchesForChain(chain.id).length > 0)).toBe(true);
+    expect(readingBranchesForChain("jingkang").map((branch) => branch.targetId)).toEqual(["linan", "chanyuan"]);
   });
 });

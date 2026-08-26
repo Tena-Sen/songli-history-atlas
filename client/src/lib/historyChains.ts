@@ -15,6 +15,14 @@ export type HistoryChain = {
   sourceUrl: string;
 };
 
+export type ReadingBranch = {
+  id: string;
+  eyebrow: string;
+  title: string;
+  description: string;
+  targetId: string;
+};
+
 export const HISTORY_CHAINS: HistoryChain[] = [
   {
     id: "northern-song", year: "960", event: "建宋：权力如何归拢", note: "从建宋起，统一、制度与城市增长被编进同一条脊柱。",
@@ -97,4 +105,19 @@ export function getHistoryChain(id: string) {
 export function nextHistoryChainIndex(length: number, currentIndex: number, direction: -1 | 1) {
   if (length <= 0) return -1;
   return (currentIndex + direction + length) % length;
+}
+
+const READING_BRANCHES: Record<string, ReadingBranch[]> = {
+  "northern-song": [{ id: "state-to-city", eyebrow: "换一条线", title: "从城市与知识开始读", description: "不从建宋的权力归拢出发，而沿书籍、技术与城市生活追问北宋如何被日常制度托起。", targetId: "movable-type" }],
+  chanyuan: [{ id: "border-to-reform", eyebrow: "换一条线", title: "从国家能力开始读", description: "将边境稳定放到财政、军政与改革议题中阅读，观察外交秩序如何进入内政讨论。", targetId: "new-policies" }],
+  "movable-type": [{ id: "knowledge-to-city", eyebrow: "换一条线", title: "从临安的城市承接开始读", description: "把技术放进城市、水路与市场，查看知识生产如何和南方城市生活共同延续。", targetId: "linan" }],
+  "new-policies": [{ id: "reform-to-border", eyebrow: "换一条线", title: "从北方关系开始读", description: "不先判断改革成败，而回到边境与外交背景，重看国家能力为何成为持续议题。", targetId: "chanyuan" }],
+  jingkang: [{ id: "jingkang-to-linan", eyebrow: "换一条线", title: "沿南迁的城市承接阅读", description: "从东京危局离开，转向临安、水路与江南城市如何承接南宋的政治延续。", targetId: "linan" }, { id: "jingkang-to-border", eyebrow: "换一条线", title: "沿北方关系的长期变化阅读", description: "回到澶渊与北方秩序，追问联盟、边境与战略判断怎样构成理解危机的更长背景。", targetId: "chanyuan" }],
+  linan: [{ id: "linan-to-sea", eyebrow: "换一条线", title: "沿海贸与知识网络阅读", description: "从都城内部转向明州、泉州等沿海城市，观察水路和海贸如何扩展南方世界。", targetId: "movable-type" }],
+  "linan-fall": [{ id: "fall-to-people", eyebrow: "换一条线", title: "沿人物行动阅读", description: "不把临安失守当作静止终点，而沿南宋末年人物与海上政局继续走向崖山。", targetId: "end-of-song" }],
+  "end-of-song": [{ id: "end-to-legacy", eyebrow: "换一条线", title: "沿遗产与城市阅读", description: "从王朝终局回到知识、城市和审美轨道，追问哪些宋代经验仍在后世流动。", targetId: "movable-type" }],
+};
+
+export function readingBranchesForChain(id: string) {
+  return READING_BRANCHES[id] ?? [];
 }

@@ -3,8 +3,8 @@
  * 不把历史关系伪装成确定因果，不使用仪表板式卡片。
  */
 import { useEffect, useMemo, useState } from "react";
-import { ArrowUpRight, ChevronRight, GitBranch, RotateCcw } from "lucide-react";
-import { getHistoryChain, HISTORY_CHAINS, nextHistoryChainIndex } from "@/lib/historyChains";
+import { ArrowUpRight, ChevronRight, GitBranch, RotateCcw, Split } from "lucide-react";
+import { getHistoryChain, HISTORY_CHAINS, nextHistoryChainIndex, readingBranchesForChain } from "@/lib/historyChains";
 
 const EVENT_NAMES: Record<string, { year: string; title: string }> = {
   "northern-song": { year: "960", title: "建宋" }, chanyuan: { year: "1005", title: "澶渊" }, "movable-type": { year: "11世纪", title: "活字印刷" }, "new-policies": { year: "1069—1072", title: "熙宁新法" }, jingkang: { year: "1127", title: "靖康" }, linan: { year: "1138", title: "临安行在" }, "linan-fall": { year: "1276", title: "临安失守" }, "end-of-song": { year: "1279", title: "崖山之后" },
@@ -30,6 +30,7 @@ export function HistoryChain() {
   const [activeId, setActiveId] = useState("jingkang");
   const active = useMemo(() => getHistoryChain(activeId), [activeId]);
   const people = CHAIN_PEOPLE[active.id] ?? [];
+  const branches = useMemo(() => readingBranchesForChain(active.id), [active.id]);
 
   useEffect(() => {
     const receiveTimelineSelection = (event: Event) => {
@@ -68,6 +69,7 @@ export function HistoryChain() {
             {active.stages.map((stage, index) => <section key={stage.label} className="chain-stage px-0 py-7 md:px-7 md:py-8"><p className="font-mono text-[10px] tracking-[.18em] text-[#4f8c85]">0{index + 1} · {stage.label}</p><h4 className="mt-4 font-serif text-2xl font-bold tracking-[-.04em]">{stage.title}</h4><p className="mt-4 text-sm leading-7 text-[#71817d]">{stage.description}</p><div className="mt-6 flex flex-wrap gap-x-3 gap-y-2">{stage.nodeIds.map((id) => { const node = EVENT_NAMES[id]; return node ? <button key={id} type="button" onClick={() => openTimelineEvent(id)} className="chain-node-link"><span>{node.year}</span>{node.title}<ChevronRight size={12} /></button> : null; })}</div></section>)}
           </div>
           {people.length > 0 && <div className="mt-7 border-t border-[#28302e]/12 pt-6"><p className="eyebrow">相关人物入口</p><div className="mt-4 flex flex-wrap gap-2">{people.map((person) => <a key={person.id} href={`/event/${person.eventId}?person=${person.id}`} className="chain-person-link"><span>{person.name}</span><small>{person.role}</small><ArrowUpRight size={12} /></a>)}</div><p className="mt-3 text-[11px] leading-5 text-[#71817d]">跳转后会直接打开该人物的小传弹窗，并保留可回看的相关事件索引。</p></div>}
+          {branches.length > 0 && <div className="branch-reading mt-8"><div className="flex items-center gap-3"><Split size={17} className="text-[#4f8c85]" strokeWidth={1.4} /><p className="eyebrow">假如沿另一条线阅读</p></div><div className="mt-5 grid gap-4 lg:grid-cols-2">{branches.map((branch) => { const target = EVENT_NAMES[branch.targetId]; return <button key={branch.id} type="button" onClick={() => setActiveId(branch.targetId)} className="branch-leaf text-left"><p className="font-mono text-[10px] tracking-[.16em] text-[#4f8c85]">{branch.eyebrow}</p><h4 className="mt-3 font-serif text-2xl font-bold tracking-[-.04em]">{branch.title}</h4><p className="mt-3 text-sm leading-7 text-[#71817d]">{branch.description}</p>{target && <span className="mt-5 inline-flex items-center gap-2 text-xs text-[#397b74]">前往 {target.year} · {target.title}<ChevronRight size={13} /></span>}</button>; })}</div><p className="mt-4 text-[11px] leading-5 text-[#71817d]">分支提示提供另一种阅读次序，不是假设历史会以该路径必然发生。</p></div>}
           <a href={active.sourceUrl} target="_blank" rel="noreferrer" className="mt-7 inline-flex items-center gap-2 border-b border-[#78a9a1] pb-1 text-xs text-[#397b74] hover:gap-3">关联资料：{active.sourceLabel}<ArrowUpRight size={13} /></a>
         </article>
       </div>

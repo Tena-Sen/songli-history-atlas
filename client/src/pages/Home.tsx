@@ -4,6 +4,7 @@
  */
 import { useEffect, useMemo, useState } from "react";
 import { ComparisonView } from "@/components/ComparisonView";
+import { CityPeopleAtlas } from "@/components/CityPeopleAtlas";
 import { ExploreLab } from "@/components/ExploreLab";
 import { FateSlices } from "@/components/FateSlices";
 import { GeographyMap } from "@/components/GeographyMap";
@@ -272,6 +273,7 @@ export default function Home() {
               <a className="nav-link" href="#reading-path">阅读路径</a>
               <a className="nav-link" href="#fate-slices">命运切片</a>
               <a className="nav-link" href="#history-chain">连锁反应</a>
+              <a className="nav-link" href="#city-people-atlas">城市人物</a>
               <a className="nav-link" href="#micro-tracks">微观轨道</a>
               <a className="nav-link" href="#map-layer">地理图层</a>
               <a className="nav-link" href="#reading-room">阅读室</a>
@@ -503,6 +505,8 @@ export default function Home() {
           <FateSlices />
 
           <HistoryChain />
+
+          <CityPeopleAtlas />
 
           <ExploreLab events={EVENTS} />
 

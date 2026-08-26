@@ -57,13 +57,14 @@ const PEOPLE: Record<string, HistoricalPerson> = {
   "song-huizong": { id: "song-huizong", name: "宋徽宗", role: "北宋晚期皇帝", era: "12世纪初 · 北方危局", bio: "北宋晚期皇帝。本站将其置入靖康节点，提示北方关系改写与东京危局之间的连续阅读线索；小传不以单一人物解释北宋终局。", note: "与北宋晚期的北方关系、东京危局和靖康节点相关。", nodeIds: ["jingkang"], sourceName: "中央广播电视总台靖康专题", sourceUrl: "https://tv.cctv.com/v/a/ARTIDHsF5VXEqQvaBT0T0r9X210504.html" },
   "song-qinzong": { id: "song-qinzong", name: "宋钦宗", role: "北宋末期皇帝", era: "1126—1127 · 东京危局", bio: "北宋末期皇帝。本站以其关联靖康节点，帮助读者从都城危局与政权终局的交会处进入事件；小传不替代对本纪和专门研究的阅读。", note: "与靖康节点中的东京失守和北宋终局相关。", nodeIds: ["jingkang"], sourceName: "中央广播电视总台靖康专题", sourceUrl: "https://tv.cctv.com/v/a/ARTIDHsF5VXEqQvaBT0T0r9X210504.html" },
   "song-gaozong": { id: "song-gaozong", name: "宋高宗", role: "南宋开创者", era: "12世纪 · 南渡与临安", bio: "南宋开创者。其经历将1127年的政权南移与1138年临安为行在所连接起来，是理解两宋分界与江南都城形成的关键线索。", note: "从1127年南渡到1138年临安为行在，串联两宋分界与江南都城形成。", nodeIds: ["jingkang", "linan"], sourceName: "《宋史·高宗纪》与宋代分期资料", sourceUrl: "https://zh.wikisource.org/wiki/宋史/卷030" },
+  "zhao-rugua": { id: "zhao-rugua", name: "赵汝适", role: "泉州市舶司相关人物", era: "13世纪 · 海贸网络", bio: "哥伦比亚大学宋代贸易资料记载：1225 年，泉州的市舶司官员赵汝适写成《诸蕃志》，记录中国商人与多地的贸易对象和货物。本站以其作为泉州与海贸网络的阅读索引。", note: "作为泉州港与《诸蕃志》的阅读入口，提示南宋时期港口、海贸与知识记录的关联。", nodeIds: ["linan"], sourceName: "哥伦比亚大学：宋代对外贸易", sourceUrl: "https://afe.easia.columbia.edu/songdynasty-module/outside-trade.html" },
   "lu-xiufu": { id: "lu-xiufu", name: "陆秀夫", role: "南宋末年大臣", era: "13世纪 · 海上政局", bio: "南宋末年大臣。《宋史》记其追从二王，并与张世杰共同参与南宋末局中的政务与军旅安排。", note: "《宋史》记其在南宋末局追从二王，并与张世杰等共同参与海上政局。", nodeIds: ["linan-fall", "end-of-song"], sourceName: "《宋史·卷451》", sourceUrl: "https://zh.wikisource.org/wiki/宋史/卷451" },
   "wen-tianxiang": { id: "wen-tianxiang", name: "文天祥", role: "南宋末年政治人物", era: "13世纪 · 宋末政治", bio: "南宋末年政治人物。《文天祥传》记其在德祐初响应勤王，并经历临安失守前后的南宋末局。", note: "站内将其作为临安失守后与南宋末局相关的阅读标签。", nodeIds: ["linan-fall", "end-of-song"], sourceName: "维基文库《文天祥传》", sourceUrl: "https://zh.wikisource.org/wiki/文天祥傳" },
   "zhang-shijie": { id: "zhang-shijie", name: "张世杰", role: "南宋末年将领", era: "13世纪 · 宋末军旅", bio: "南宋末年将领。本站以其与陆秀夫的关联，阅读临安失守之后南宋政权收缩与崖山终局。", note: "与陆秀夫共同关联南宋政权收缩与崖山终局的站内叙事。", nodeIds: ["linan-fall", "end-of-song"], sourceName: "《宋史·卷451》", sourceUrl: "https://zh.wikisource.org/wiki/宋史/卷451" },
 };
 
 const PEOPLE_BY_NODE: Record<string, string[]> = {
-  "northern-song": ["zhao-kuangyin"], chanyuan: ["song-zhenzong", "kou-zhun"], "movable-type": ["bi-sheng", "shen-kuo"], "new-policies": ["wang-anshi", "song-shenzong"], jingkang: ["song-huizong", "song-qinzong", "song-gaozong"], linan: ["song-gaozong"], "linan-fall": ["lu-xiufu", "wen-tianxiang", "zhang-shijie"], "end-of-song": ["lu-xiufu", "wen-tianxiang", "zhang-shijie"],
+  "northern-song": ["zhao-kuangyin"], chanyuan: ["song-zhenzong", "kou-zhun"], "movable-type": ["bi-sheng", "shen-kuo"], "new-policies": ["wang-anshi", "song-shenzong"], jingkang: ["song-huizong", "song-qinzong", "song-gaozong"], linan: ["song-gaozong", "zhao-rugua"], "linan-fall": ["lu-xiufu", "wen-tianxiang", "zhang-shijie"], "end-of-song": ["lu-xiufu", "wen-tianxiang", "zhang-shijie"],
 };
 
 export default function NodeDetail() {

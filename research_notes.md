@@ -125,3 +125,13 @@
 - 连锁反应模块应使用“前因 / 当下冲突 / 后续余波”的阅读结构；所有连线表示可继续阅读的历史关联，不表达单一原因、必然结果或历史重要性的量化排序。
 
 19. Columbia University, Asia for Educators, Timeline of Chinese Historical Periods and Dynasties：https://afe.easia.columbia.edu/timelines/china_timeline.htm
+
+## 城市—人物双轴关系图：资料边界
+
+- 哥伦比亚大学的宋代对外贸易资料说明：宋代对外海贸活跃，泉州是重要沿海城市；宋代的海上贸易规模超过陆上对外贸易。关系图可将泉州与海贸、沿海联系相连，但不以简化连线表示人物对贸易的单一决定作用。
+- 同一资料也说明宋与北方邻国的贸易和边境关系相连；东京相关人物的连线在网站中应标注为“政权/边境关系的阅读关联”，而不是商业路线。
+- 哥伦比亚大学城市专题将杭州（临安）描述为南宋首都，位于大运河的南端，并具备贸易中心条件。关系图可将临安与宋高宗、南迁、运河城市生活相连。
+- 图谱只展示站内已编入的城市、人物、节点关系；线条代表可继续阅读的关联，不表达唯一因果、影响强度或完整人物生平。
+
+20. Columbia University, Asia for Educators, Song Dynasty China: Outside Trade：https://afe.easia.columbia.edu/songdynasty-module/outside-trade.html
+21. Columbia University, Asia for Educators, Song Dynasty China: Cities of the Song：https://afe.easia.columbia.edu/songdynasty-module/cities-hangzhou.html
