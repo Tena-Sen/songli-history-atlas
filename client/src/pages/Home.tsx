@@ -5,6 +5,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ComparisonView } from "@/components/ComparisonView";
 import { ExploreLab } from "@/components/ExploreLab";
+import { FateSlices } from "@/components/FateSlices";
 import { GeographyMap } from "@/components/GeographyMap";
 import { nextTimelineIndex } from "@/lib/timelineNavigation";
 import {
@@ -41,10 +42,10 @@ const EVENTS: TimelineEvent[] = [
   {
     id: "northern-song",
     year: "960",
-    title: "北宋建立",
-    short: "赵匡胤建宋，新的中央政权开启。",
+    title: "建宋：权力如何归拢",
+    short: "赵匡胤建宋，新的中央政权由此起笔。",
     detail:
-      "宋朝自此展开约三个世纪的历史。北宋阶段以统一、文官制度扩展与城市经济增长为主要叙事背景。",
+      "从建宋起，北宋的统一、文官制度扩展与城市经济增长被放进同一条历史脊柱：政权如何归拢，社会又如何在其间生长。",
     category: "政权",
     tag: "北宋起点",
     source: "史密森尼亚洲艺术国家博物馆",
@@ -55,10 +56,10 @@ const EVENTS: TimelineEvent[] = [
   {
     id: "chanyuan",
     year: "1005",
-    title: "澶渊之盟",
-    short: "宋辽缔约，北方边境进入相对稳定期。",
+    title: "澶渊：稳定的边境",
+    short: "宋辽缔约，北方关系进入相对稳定期。",
     detail:
-      "这份盟约成为北宋处理北方关系的重要节点，也让中原社会在较长时间内维持相对稳定的外部环境。",
+      "这份盟约是北宋处理北方关系的重要节点。它提示稳定不是静止，而是财政、军政与边境秩序暂时形成的一种安排。",
     category: "外交",
     tag: "北方关系",
     source: "Cambridge University Press",
@@ -82,10 +83,10 @@ const EVENTS: TimelineEvent[] = [
   {
     id: "new-policies",
     year: "1069—1072",
-    title: "王安石新法",
-    short: "财政、官员选拔与军政制度同步调整。",
+    title: "熙宁新法：国家如何变法",
+    short: "财政、选官与军政被同时放上改革的案头。",
     detail:
-      "在神宗支持下，王安石推行了一系列改革，涉及财政管理、官员招募与训练，以及军队组织。新法引发持续而深刻的政治争论。",
+      "在神宗支持下，王安石推行一系列涉及财政、选官与军政的改革。这里把“新法”读成国家能力与政治争论同时被改写的现场。",
     category: "制度",
     tag: "制度重塑",
     source: "EBSCO Research Starters",
@@ -96,10 +97,10 @@ const EVENTS: TimelineEvent[] = [
   {
     id: "jingkang",
     year: "1127",
-    title: "靖康之变",
-    short: "北宋覆亡，宋室南迁；两宋由此分界。",
+    title: "靖康：北方秩序的断裂",
+    short: "东京失守、徽钦北去；北宋终局与宋室南迁相连。",
     detail:
-      "1127 年是北宋与南宋的分界。政权重心由北方向南方转移，南宋自此在江南延续其政治与文化生活。",
+      "靖康不是孤立的年份。网站以联盟选择、边境压力、东京危局与政权南迁构成连续链条，但不以任何单一原因解释北宋终局。",
     category: "转折",
     tag: "两宋分界",
     source: "大都会艺术博物馆 / 史密森尼",
@@ -109,10 +110,10 @@ const EVENTS: TimelineEvent[] = [
   {
     id: "linan",
     year: "1138",
-    title: "临安为行在",
-    short: "江南都城形成，水路城市展开。",
+    title: "临安行在：江南如何承接",
+    short: "南迁之后，水路、商市与新都城共同展开。",
     detail:
-      "绍兴八年，宋高宗正式以临安为“行在所”。临安此后至 1276 年都是南宋实际意义上的国都，运河、水路与商市共同塑造这座江南都城。",
+      "绍兴八年，宋高宗正式以临安为“行在所”。南迁不是故事的尾声：运河、水路与商市共同塑造这座承接政权与文化生活的江南都城。",
     category: "城市",
     tag: "江南都城",
     source: "人民日报 / 中国大运河博物馆",
@@ -122,10 +123,10 @@ const EVENTS: TimelineEvent[] = [
   {
     id: "linan-fall",
     year: "1276",
-    title: "临安失守",
-    short: "元军攻破临安，南宋政权进一步收缩。",
+    title: "临安失守：都城之后的路",
+    short: "都城失守，南宋从江南政治中心走向海上末局。",
     detail:
-      "临安失守意味着南宋失去长期的政治中心；由水路与市场支撑的江南都城生活，也进入了王朝晚期的历史章节。",
+      "临安失守意味着南宋失去长期政治中心；但王朝并未立刻结束。政权收缩、人物行动与海上末局仍在继续，终局因此被拉长为一段人的行动史。",
     category: "转折",
     tag: "晚期危局",
     source: "人民日报 / 中国大运河博物馆",
@@ -135,10 +136,10 @@ const EVENTS: TimelineEvent[] = [
   {
     id: "end-of-song",
     year: "1279",
-    title: "宋朝终结",
-    short: "崖山之后，两宋历史落幕。",
+    title: "崖山之后：王朝落幕，遗产未止",
+    short: "两宋终章落下，而制度、城市与审美仍继续流动。",
     detail:
-      "南宋阶段至 1279 年结束。两宋的制度、城市、技术与审美遗产，则继续影响其后的中国文化史。",
+      "南宋阶段至1279年结束。王朝意义上的终局并未抹去两宋遗产；制度、城市、技术与审美继续进入之后的中国文化史。",
     category: "政权",
     tag: "王朝终章",
     source: "史密森尼亚洲艺术国家博物馆",
@@ -256,6 +257,7 @@ export default function Home() {
               <a className="nav-link" href="#time-spine">历史脊柱</a>
               <a className="nav-link" href="#comparison">对比视图</a>
               <a className="nav-link" href="#reading-path">阅读路径</a>
+              <a className="nav-link" href="#fate-slices">命运切片</a>
               <a className="nav-link" href="#micro-tracks">微观轨道</a>
               <a className="nav-link" href="#map-layer">地理图层</a>
               <a className="nav-link" href="#reading-room">阅读室</a>
@@ -461,6 +463,7 @@ export default function Home() {
                   <p className="mt-5 font-mono text-[11px] tracking-[0.16em] text-[#4f8c85]">{selected.year}</p>
                   <h3 className="mt-1 font-serif text-3xl font-bold tracking-[-0.045em]">{selected.title}</h3>
                   <p className="mt-4 text-[15px] leading-7 text-[#53615d] night:text-[#b4b9b2]">{selected.detail}</p>
+                  {selected.id === "jingkang" && <div className="conflict-rail mt-6"><p className="eyebrow">冲突转折编排</p><ol className="mt-3"><li>联盟选择</li><li>边境压力</li><li>东京危局</li><li>政权南迁</li></ol><p className="mt-3 text-[11px] leading-5 text-[#71817d]">这是阅读链条，而非单因果解释；展开详情页可继续查看人物与史料索引。</p></div>}
                   <div className="mt-6 flex items-center justify-between border-t border-[#28302e]/10 pt-4 text-xs text-[#71817d]">
                     <span>{categoryLabels[selected.category]}</span>
                     <a
@@ -482,6 +485,8 @@ export default function Home() {
               </aside>
             </div>
           </section>
+
+          <FateSlices />
 
           <ExploreLab events={EVENTS} />
 
@@ -582,6 +587,7 @@ export default function Home() {
                     ["大都会艺术博物馆", "中国1000—1400年编年资料", "https://www.metmuseum.org/toah/ht/07/eac.html"],
                     ["哥伦比亚大学", "宋代技术、经济、城市与印刷", "https://afe.easia.columbia.edu/songdynasty-module/"],
                     ["EBSCO Research Starters", "王安石改革的年代与领域", "https://www.ebsco.com/research-starters/history/wang-anshi-introduces-bureaucratic-reforms/"],
+                    ["李亚平《说宋朝》", "叙事参考：人物切入与章节节奏（非史料）", "https://www.youtube.com/playlist?list=PLZq60TqYoihpF8MXewu_SveWephV3cDD3"],
                   ].map(([name, note, href], index) => (
                     <a
                       key={name}
