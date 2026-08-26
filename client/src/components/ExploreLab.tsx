@@ -3,7 +3,8 @@
  * 用留白、细线与天青节点组织探索，而非通用仪表板卡片。
  */
 import { useEffect, useMemo, useState } from "react";
-import { Bookmark, Check, ChevronDown, ChevronUp, Download, Network, Share2, X } from "lucide-react";
+import { Bookmark, BookmarkPlus, Check, ChevronDown, ChevronUp, Download, Network, Share2, Trash2, X } from "lucide-react";
+import { addPosterPreset, DEFAULT_POSTER_PRESETS, makePosterPreset, parsePosterPresets, posterFieldsFromPreset, POSTER_PRESET_STORAGE_KEY, removePosterPreset, type PosterPreset, type PosterThemeName } from "@/lib/posterPresets";
 
 export type ExploreEvent = {
   id: string;
@@ -22,7 +23,7 @@ const POSTER_THEMES = {
   silk: { label: "赭石 · 绢本", paper: "#f0e2c7", ink: "#3e3029", body: "#756050", accent: "#9f8066", seal: "#a66457", wash: "rgba(176, 137, 92, .28)" },
 } as const;
 
-type PosterTheme = keyof typeof POSTER_THEMES;
+type PosterTheme = PosterThemeName;
 
 const RELATION_EDGES = [
   ["northern-song", "chanyuan", "边境秩序"],
@@ -48,6 +49,9 @@ export function ExploreLab({ events }: { events: ExploreEvent[] }) {
   const [posterTitle, setPosterTitle] = useState("我的阅读路径");
   const [posterSubtitle, setPosterSubtitle] = useState("北宋至南宋 · 微观时间轴");
   const [posterTheme, setPosterTheme] = useState<PosterTheme>("celadon");
+  const [presetName, setPresetName] = useState("");
+  const [presets, setPresets] = useState<PosterPreset[]>([]);
+  const [presetNotice, setPresetNotice] = useState("");
 
   useEffect(() => {
     try {
@@ -58,6 +62,10 @@ export function ExploreLab({ events }: { events: ExploreEvent[] }) {
     }
   }, []);
 
+  useEffect(() => {
+    setPresets(parsePosterPresets(window.localStorage.getItem(POSTER_PRESET_STORAGE_KEY)));
+  }, []);
+
   const save = (next: string[]) => {
     setSaved(next);
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
@@ -65,6 +73,31 @@ export function ExploreLab({ events }: { events: ExploreEvent[] }) {
 
   const toggle = (id: string) => {
     save(saved.includes(id) ? saved.filter((item) => item !== id) : [...saved, id]);
+  };
+
+  const savePresets = (next: PosterPreset[]) => {
+    setPresets(next);
+    window.localStorage.setItem(POSTER_PRESET_STORAGE_KEY, JSON.stringify(next));
+  };
+
+  const saveCurrentPreset = () => {
+    const nextPreset = makePosterPreset({ name: presetName, title: posterTitle, subtitle: posterSubtitle, theme: posterTheme });
+    savePresets(addPosterPreset(presets, nextPreset));
+    setPresetName("");
+    setPresetNotice(`已保存「${nextPreset.name}」`);
+  };
+
+  const applyPreset = (preset: PosterPreset) => {
+    const fields = posterFieldsFromPreset(preset);
+    setPosterTitle(fields.title);
+    setPosterSubtitle(fields.subtitle);
+    setPosterTheme(fields.theme);
+    setPresetNotice(`已应用「${preset.name}」`);
+  };
+
+  const removePreset = (id: string, name: string) => {
+    savePresets(removePosterPreset(presets, id));
+    setPresetNotice(`已移除「${name}」`);
   };
 
   const move = (id: string, direction: -1 | 1) => {
@@ -77,7 +110,7 @@ export function ExploreLab({ events }: { events: ExploreEvent[] }) {
   };
 
   const savedEvents = useMemo(
-    () => events.filter((event) => saved.includes(event.id)).sort((a, b) => yearNumber(a.year) - yearNumber(b.year)),
+    () => saved.map((id) => events.find((event) => event.id === id)).filter((event): event is ExploreEvent => Boolean(event)),
     [events, saved]
   );
 
@@ -154,6 +187,13 @@ export function ExploreLab({ events }: { events: ExploreEvent[] }) {
               <label className="poster-field mt-4"><span>标题</span><input value={posterTitle} maxLength={12} onChange={(event) => setPosterTitle(event.target.value)} aria-label="海报标题" /></label>
               <label className="poster-field mt-3"><span>副标题</span><input value={posterSubtitle} maxLength={28} onChange={(event) => setPosterSubtitle(event.target.value)} aria-label="海报副标题" /></label>
               <div className="mt-4"><span className="poster-field-label">宋韵配色</span><div className="mt-3 flex flex-wrap gap-2">{(Object.keys(POSTER_THEMES) as PosterTheme[]).map((key) => <button key={key} type="button" onClick={() => setPosterTheme(key)} className={`poster-theme ${posterTheme === key ? "poster-theme-active" : ""}`} aria-pressed={posterTheme === key}><i style={{ background: POSTER_THEMES[key].accent }} /><span>{POSTER_THEMES[key].label}</span></button>)}</div></div>
+            </div>
+            <div className="poster-preset-panel mt-6">
+              <div className="flex items-center justify-between gap-4"><p className="eyebrow">我的宋韵预设</p><span className="font-mono text-[10px] tracking-[0.14em] text-[#71817d]">{presets.length.toString().padStart(2, "0")} / 08</span></div>
+              <div className="mt-4"><span className="poster-field-label">内置方案</span><div className="mt-3 flex flex-wrap gap-2">{DEFAULT_POSTER_PRESETS.map((preset) => <button key={preset.id} type="button" onClick={() => applyPreset(preset)} className="default-preset" aria-label={`应用默认方案${preset.name}`}><i style={{ background: POSTER_THEMES[preset.theme].accent }} />{preset.name}</button>)}</div></div>
+              <div className="mt-4 flex gap-2"><input value={presetName} maxLength={18} onChange={(event) => setPresetName(event.target.value)} aria-label="预设名称" placeholder="为此方案命名" className="preset-name-input" /><button type="button" onClick={saveCurrentPreset} className="preset-save-button"><BookmarkPlus size={14} /> 保存</button></div>
+              {presets.length ? <div className="mt-4 divide-y divide-[#28302e]/10 border-y border-[#28302e]/10">{presets.map((preset) => <div key={preset.id} className="flex items-center gap-2 py-3"><button type="button" onClick={() => applyPreset(preset)} className="preset-apply min-w-0 flex-1 text-left"><i style={{ background: POSTER_THEMES[preset.theme].accent }} /><span className="min-w-0"><strong>{preset.name}</strong><em>{POSTER_THEMES[preset.theme].label} · {preset.title}</em></span></button><button type="button" onClick={() => removePreset(preset.id, preset.name)} className="preset-delete" aria-label={`删除预设${preset.name}`}><Trash2 size={14} /></button></div>)}</div> : <p className="mt-4 text-xs leading-6 text-[#71817d]">保存常用的题签与配色，下一次可一键应用。</p>}
+              <p className="sr-only" aria-live="polite">{presetNotice}</p>
             </div>
             <button type="button" onClick={makePoster} className="mt-7 inline-flex items-center gap-2 bg-[#28302e] px-4 py-3 text-sm text-[#f6f2e8] transition hover:bg-[#4f8c85] night:bg-[#78a9a1] night:text-[#0e161a]"><Share2 size={16} /> 生成分享海报 <Download size={14} /></button>
             {shared && <p className="mt-3 inline-flex items-center gap-2 text-xs text-[#4f8c85]"><Check size={14} /> 海报已下载，可直接分享。</p>}
